@@ -41,7 +41,7 @@ Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
  2. Collecter les clés d'API et les accés pour :
 - [Epices](https://www.epices-energie.fr/fr/): système de supervision PV.  
 - [OpenWeatherMap](https://openweathermap.org): données météo libres (jour,  3 derniers jours).  
-- Votre [NextCloud](https://nextcloud.com) instance: pour archiver les données en JSON (optionel).
+- Votre instance [NextCloud](https://nextcloud.com): pour archiver les données en JSON (optionel).
 - [Mapbox](https://www.mapbox.com): librairie de cartographie. 
  3. Remplir config.py avec vos clés / accés. 
  4. Remplir config.py avec le DataFrame df_sites qui contient les données des sites de production
