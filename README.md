@@ -31,7 +31,6 @@ CoopTracker
 └───ES -> données d'entrée spécifiques à Electrons Solaires
     └───93.geojson  ->  Polygones pour les villes de Seine Saint-Denis (93)
     └───idf.geojson  ->  Polygones pour les villes de Ile de France    
-    └───datagouv-communes.geojson  ->  Polygones pour les villes de France
     └───convert.py ->  Utilitaire pour extraire les données
 ```
 
