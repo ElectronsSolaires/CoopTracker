@@ -49,7 +49,7 @@ Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
 
 ## Contact
 Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter ici:
-- webmestre@www.electrons-solaires93.org
+- webmestre@electrons-solaires93.org
 
 ### TODO
 
