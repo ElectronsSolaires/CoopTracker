@@ -58,5 +58,5 @@ Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter 
 
 ### TODO
 
-- Configurer les plots plotly en Francais
+- Configurer les graphiques Plotly en Francais
 - Archiver les JSON journaliers en local au lieu de NextCloud
