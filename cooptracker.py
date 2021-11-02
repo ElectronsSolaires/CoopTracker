@@ -29,7 +29,7 @@ import re
 import sys
 
 import config as cfg        #file containing API keys / credentials / configuration
-update_all = True           #update all plots (independently of scheduled updated)
+update_all = True           #update all plots (independently of scheduled updates)
 file_path = "./ES/"         #tell where local files are stored 
 
 
