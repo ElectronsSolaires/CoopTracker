@@ -5,11 +5,16 @@ Ce code lit les données en provenance de plusieurs sources externes:
 - L'API [Epices](https://www.epices-energie.fr/fr/) 
 - [OpenWeatherMap](https://openweathermap.org)
 
-Puis il produit des graphiques sur :
+Puis il produit des graphiques et du texte sur :
 - l'historique de production 
 - la production du jour
 - l'historique météo 
 - la distribution géographique des sociétaires
+
+Vous trouverez des exemples de rendu ici:
+- https://www.electrons-solaires93.org/
+- https://www.electrons-solaires93.org/productionwaldeckrousseau/
+- https://www.electrons-solaires93.org/productionjeanzay/
 
 ## Licence
 Tout le contenu est sous licence [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
