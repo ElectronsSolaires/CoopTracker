@@ -1,5 +1,5 @@
 # CoopTracker 
-Ce code met à jour en continu des graphiques pour suivre la production de centrales solaires gérées par le logiciel [Epices](https://www.epices-energie.fr/fr/). Il a été developé initialement au sein des [Electrons Solaires](https://www.electrons-solaires93.org), une coopérative citoyenne créé par des citoyens engagés qui installe des centrales photo-voltaïques dans la communauté de communes [Est Ensemble](https://www.est-ensemble.fr) en région parisienne. 
+Ce code met à jour en continu des graphiques pour suivre la production de centrales solaires gérées par le logiciel [Epices](https://www.epices-energie.fr/fr/). Il a été développé  au sein des [Electrons Solaires](https://www.electrons-solaires93.org), une coopérative citoyenne créée par des citoyens engagés qui installe des centrales photo-voltaïques dans la communauté de communes [Est Ensemble](https://www.est-ensemble.fr) en région parisienne. 
 
 Ce code lit les données en provenance de plusieurs sources externes:
 - L'API [Epices](https://www.epices-energie.fr/fr/) 
@@ -24,14 +24,14 @@ Ce dépot est organisé de la manière suivante:
 ```
 CoopTracker
 └─── README.md
-|
+└─── CC-BY-SA-4.0.txt
 └───src
-    └───cooptracker.py and .ipynb  ->  Jupyter Notebook et le fichier .py correspondant
-|
-└───ES -> données d'entrée spécifiques à Electrons Solaires
-    └───93.geojson  ->  Polygones pour les villes de Seine Saint-Denis (93)
-    └───idf.geojson  ->  Polygones pour les villes de Ile de France    
-    └───convert.py ->  Utilitaire pour extraire les données
+    └───cooptracker.py and .ipynb -> Jupyter Notebook et le fichier .py correspondant
+    └───config.py -> Contient les clés, accés et paramètres de configuration
+└───ES -> données d'entrée spécifiques pour Electrons Solaires
+    └───93.geojson -> Polygones pour les villes de Seine Saint-Denis (93)
+    └───idf.geojson -> Polygones pour les villes de Ile de France    
+    └───convert.py -> Utilitaire pour extraire les données geojson
 ```
 
 ### Configuration
@@ -44,7 +44,7 @@ Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
 - [Mapbox](https://www.mapbox.com): librairie de cartographie. 
  3. Remplir config.py avec vos clés / accés. 
  4. Remplir config.py avec le DataFrame df_sites qui contient les données des sites de production
- 5. Executer cooptracker.py sur votre serveur favori 
+ 5. Executer cooptracker.py sur votre  machine ou serveur favori 
 
 ## Contact
 Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter ici:
@@ -53,3 +53,4 @@ Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter 
 ### TODO
 
 - Configurer les plots plotly en Francais
+- Archiver les JSON journaiers en local au lieu de NextCloud
