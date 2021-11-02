@@ -15,6 +15,7 @@ Vous trouverez des exemples de rendu ici:
 - https://www.electrons-solaires93.org/
 - https://www.electrons-solaires93.org/productionwaldeckrousseau/
 - https://www.electrons-solaires93.org/productionjeanzay/
+- https://www.electrons-solaires93.org/devenir-societaire/ (carte des sociétaires)
 
 ## Licence
 Tout le contenu est sous licence [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
@@ -41,7 +42,7 @@ CoopTracker
 
 ### Configuration
 Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
- 1. Configurer [Epices](https://www.epices-energie.fr/fr/) pour activater l'API
+ 1. Configurer [Epices](https://www.epices-energie.fr/fr/) pour activer l'API
  2. Collecter les clés d'API et les accés pour :
 - [Epices](https://www.epices-energie.fr/fr/): système de supervision PV.  
 - [OpenWeatherMap](https://openweathermap.org): données météo libres (jour,  3 derniers jours).  
@@ -58,4 +59,4 @@ Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter 
 ### TODO
 
 - Configurer les plots plotly en Francais
-- Archiver les JSON journaiers en local au lieu de NextCloud
+- Archiver les JSON journaliers en local au lieu de NextCloud
