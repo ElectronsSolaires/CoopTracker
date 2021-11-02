@@ -9,7 +9,7 @@ Puis il produit des graphiques et du texte sur :
 - l'historique de production 
 - la production du jour
 - l'historique météo 
-- la distribution géographique des sociétaires
+- la répartition géographique des sociétaires
 
 Vous trouverez des exemples de rendu ici:
 - https://www.electrons-solaires93.org/
@@ -50,7 +50,7 @@ Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
 - [Mapbox](https://www.mapbox.com): librairie de cartographie. 
  3. Remplir config.py avec vos clés / accés. 
  4. Remplir config.py avec le DataFrame df_sites qui contient les données des sites de production
- 5. Executer cooptracker.py sur votre  machine ou serveur favori 
+ 5. Executer cooptracker.py sur votre  machine ou serveur favori. 
 
 ## Contact
 Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter ici:
