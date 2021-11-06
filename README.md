@@ -53,7 +53,7 @@ Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
  5. Executer cooptracker.py sur votre  machine ou serveur favori. 
 
 ## Contact
-Le code est la doc. Mais si vous avez des questions, vous pouvez nous contacter ici:
+Le code est la doc. Mais si vous avez des questions / des suggestions, ou si vous souhaitez contribuer, vous pouvez nous contacter ici:
 - webmestre@electrons-solaires93.org
 
 ### TODO
