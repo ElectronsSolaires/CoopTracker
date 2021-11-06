@@ -1,7 +1,7 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # coding: utf-8
 
-# In[1]:
+# In[ ]:
 
 
 ##########################################################################################
@@ -29,11 +29,11 @@ import re
 import sys
 
 import config as cfg        #file containing API keys / credentials / configuration
-update_all = True           #update all plots (independently of scheduled updates)
+update_all = True          #update all plots (independently of scheduled updated)
 file_path = "./ES/"         #tell where local files are stored 
 
 
-# In[4]:
+# In[ ]:
 
 
 ###########################################################################
@@ -42,9 +42,9 @@ file_path = "./ES/"         #tell where local files are stored
 # - Uses Plotly/Mapbox and OpenStreetMap data
 ##################################################################################
 
-#Updated once a day at 1am (UTC)
-if datetime.now().hour == 1 or update_all == True:
-    #Get CSV from URL
+#Updated once a day at 3am (UTC)
+if datetime.now().hour == 3 or update_all == True:
+    #Get CSV from file
     df = pd.read_csv(file_path + cfg.CSV_SOCIETARIES,sep=';') 
 
     #Load GeoJSON data (polygones)
@@ -106,10 +106,10 @@ if datetime.now().hour == 1 or update_all == True:
             url=cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
             data=open(file_path + filename + ".png", 'rb'), 
             headers=headers, 
-            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD)) 
+            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))  
 
 
-# In[6]:
+# In[ ]:
 
 
 #########################################################################
@@ -136,7 +136,7 @@ def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
         go.Line(
             x=df_prod[col_time],
             y=df_prod['gh_wm2'],
-            name="ensoleillement (W/m2)",
+            name="prévision ensoleillement (W/m2)",
             line=dict(color='rgb(37, 64, 143)'),
             hovertemplate =
             '<b>Date</b>: %{x} h'+
@@ -159,8 +159,8 @@ def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
     fig.update_layout(legend=dict(orientation="h",yanchor="bottom",x=0,y=1))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
-    fig.update_yaxes(title_text="<b>Ensoleillement (W/m2)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='left')
-    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", secondary_y=False, side='right')
+    fig.update_yaxes(title_text="<b>Ensoleillement (W/m2)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='right')
+    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", secondary_y=False, side='left')
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
@@ -184,7 +184,7 @@ def plot_hist_prod_only(df_prod, titlename, col_time, col_time_text):
     ))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
-    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", side='right')
+    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", side='left')
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
@@ -197,17 +197,27 @@ def save_prod_day_text(df, filename):
     file1 = open(file_path + filename + ".html","w")
     file1.write(text)
     file1.close()
+        
+def fix_locale_htmlfile(filename):
+    f = open(filename,'r')
+    filedata = f.read()
+    f.close()
+    newdata = filedata.replace("<head>","<head><script src='https://cdn.plot.ly/plotly-locale-fr-latest.js'></script>")
+    f = open(filename,'w')
+    f.write(newdata)
+    f.close()   
 
-def save_figs_prod_day(fig, filename):
+def save_fig(fig, filename):
     fig.write_image(file_path + filename + ".png",scale=2.5, width=900)   
-    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False)) #, "scrollZoom":False})
-    fig.show()
+    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False))
+    fix_locale_htmlfile(file_path + filename + ".html")
+    fig.show(config=dict(locale='fr', displayModeBar=False))
 
     #Upload on NextCloud
     if cfg.NEXTCLOUD == True:
         headers = {'Content-type': 'image/png', 'Slug': filename + ".png"}
         r = requests.put(
-            url = cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
+            url=cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
             data=open(file_path + filename + ".png", 'rb'), 
             headers=headers, 
             auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))
@@ -218,7 +228,7 @@ if datetime.now().hour >= 8:
     for row in range(0, len(cfg.df_sites)):
         df_prod=get_data_prod_day(cfg.df_sites.iloc[row]['EPID'],d, cfg.df_sites.iloc[row]['PREFIX'])
         fig=plot_hist_prod(df_prod, "Historique journalier de production ("+cfg.df_sites.iloc[row]['SNAME']+", "+cfg.df_sites.iloc[row]['CITY']+")", 'utc_timestamps_Paris', 'Heures')
-        save_figs_prod_day(fig, cfg.df_sites.iloc[row]['PREFIX']+'_prod_today')
+        save_fig(fig, cfg.df_sites.iloc[row]['PREFIX']+'_prod_today')
         save_prod_day_text(df_prod, cfg.df_sites.iloc[row]['PREFIX']+'_prod_today_tex')
         if row == 0:
             df_prodAll=df_prod
@@ -226,10 +236,10 @@ if datetime.now().hour >= 8:
         
     #Total production of all sites
     fig=plot_hist_prod_only(df_prodAll, "Historique journalier de production", 'utc_timestamps_Paris', 'Heures')
-    save_figs_prod_day(fig, 'All_prod_today')
+    save_fig(fig, 'All_prod_today')
 
 
-# In[7]:
+# In[ ]:
 
 
 #########################################################################
@@ -271,19 +281,6 @@ def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud):
                 auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))
     return df_prod
 
-def save_figs_prod_hist(fig, filename):
-    fig.write_image(file_path + filename + ".png",scale=2.5, width=900)
-    fig.show()
-
-    #Upload on NextCloud
-    if cfg.NEXTCLOUD == True:
-        headers = {'Content-type': 'image/png', 'Slug': filename + ".png"}
-        r = requests.put(
-            url=cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
-            data=open(file_path + filename + ".png", 'rb'), 
-            headers=headers, 
-            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))
-
 def prod_hist(start_date, end_date, days):
     if days == 30:
         col_time = 'Date'
@@ -302,16 +299,16 @@ def prod_hist(start_date, end_date, days):
             df_grouped=df_prod.groupby('Date').sum().reset_index()
             df_prod = pd.DataFrame(df_grouped)
         fig=plot_hist_prod_only(df_prod, "Historique " + str(days) + " derniers jours de production ("+cfg.df_sites.iloc[row]['SNAME']+", +"+cfg.df_sites.iloc[row]['CITY']+"+)", col_time, col_time_text)
-        fig=save_figs_prod_hist(fig, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_" + str(days))        
+        fig=save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_" + str(days))        
 
-#updated once a day at 1am
-if datetime.now().hour == 1 or update_all == True:
+#updated once a day at 4am
+if datetime.now().hour == 4 or update_all == True:
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
     prod_hist(start_date, end_date, 3)
 
 
-# In[8]:
+# In[ ]:
 
 
 #########################################################################
@@ -366,8 +363,8 @@ def plot_hist_prod_day(df_prod, titlename, col_time, col_time_text):
     ))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
-    fig.update_yaxes(title_text="<b>Equivalent (habitants)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='left')
-    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", secondary_y=False, side='right')
+    fig.update_yaxes(title_text="<b>Equivalent (habitants)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='right')
+    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", secondary_y=False, side='left')
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
@@ -380,11 +377,6 @@ def save_prod_hist_text(site, s, k, d, filename):
     file1 = open(file_path + filename + ".html","w")
     file1.write(text)
     file1.close()
-
-def save_prod_hist_unhabitants(fig, filename):
-    fig.write_image(file_path + filename + ".png",scale=2.5, width=900)
-    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False))
-    fig.show()
 
 def plot_hist_prod_unhabitants():
     df = pd.DataFrame(columns=['site','unhabitants_equivalents'])
@@ -417,7 +409,7 @@ def prod_hist_day(start_date, end_date, days):
     for row in range(0, len(cfg.df_sites)):
         df_prod=get_data_prod_hist_day(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'])
         fig=plot_hist_prod_day(df_prod, "Historique " + str(days) + " derniers jours de production (" + cfg.df_sites.iloc[row]['SNAME'] + ", " + cfg.df_sites.iloc[row]['CITY'] + ")", col_time, col_time_text)
-        fig=save_figs_prod_hist(fig, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_" + str(days))
+        fig=save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_" + str(days))
         mean=round(df_prod['unhabitants_equivalents'].mean(),1)
         kwh=round(df_prod['total_production_in_wh'].sum(),1)
         cfg.df_sites.loc[row,"EH"] = mean
@@ -430,14 +422,14 @@ def prod_hist_day(start_date, end_date, days):
         kwhAll = kwhAll + kwh
     #Total production for all sites
     fig=plot_hist_prod_day(df_prodAll, "Historique " + str(days) + " derniers jours de production", col_time, col_time_text)
-    save_figs_prod_hist(fig, "All-prod_hist_" + str(days)) 
+    save_fig(fig, "All-prod_hist_" + str(days)) 
     
     #Mean equivalent habitants for all sites
     fig=plot_hist_prod_unhabitants()
-    save_prod_hist_unhabitants(fig,"prod_hist_unhabitants")
+    save_fig(fig,"prod_hist_unhabitants")
 
-#updates once a day at 1am (UTC)
-if datetime.now().hour == 1 or update_all == True:
+#updates once a day at 4am (UTC)
+if datetime.now().hour == 4 or update_all == True:
     thrity_days_ago = datetime.now() - timedelta(days=30)
     start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
     prod_hist_day(start_date, end_date, 30)
@@ -445,7 +437,7 @@ if datetime.now().hour == 1 or update_all == True:
 
 # 
 
-# In[9]:
+# In[ ]:
 
 
 ######################################################################################################
@@ -481,7 +473,7 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
             line=dict(color='rgb(37, 64, 143)'),
             hovertemplate =
             '<b>Date</b>: %{x} h'+
-            '<br><b>Ensoleilement</b>: %{y:.1f} (W/m2) <br><extra></extra>'
+            '<br><b>Ensoleilement</b>: %{y:.1f} W/m2<br><extra></extra>'
             #legendgroup = '1'
         ),secondary_y=True)# row=1, col=1)
     fig.add_trace(
@@ -497,8 +489,8 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
         ),secondary_y=False)# row=1, col=1)
 
     #fig.update_xaxes(title_text = 'Jours', row=1, col=1)
-    fig.update_yaxes(title_text="<b>Ensoleilement (W/m2)</b>",  color="rgb(37, 64, 143)", secondary_y=True)# row=1, col=1)
-    fig.update_yaxes(title_text="<b>Nébulosité (%)</b>", color="red", secondary_y=False)# row=1, col=1)
+    fig.update_yaxes(title_text="<b>Ensoleilement (W/m2)</b>",  color="rgb(37, 64, 143)", secondary_y=True, side='right')# row=1, col=1)
+    fig.update_yaxes(title_text="<b>Nébulosité (%)</b>", color="red", secondary_y=False, side='left')# row=1, col=1)
     #fig = fig.update_layout(specs=[[{"secondary_y": True}]], row=2, col=1)
     #fig.add_trace(
     #    go.Line(
@@ -533,22 +525,8 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
-def save_figs_weather_day(fig, filename):
-    fig.write_image(file_path + filename + ".png",scale=2.5, width=900)   
-    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False))
-    fig.show()
-
-    #Upload on NextCloud
-    if cfg.NEXTCLOUD == True:
-        headers = {'Content-type': 'image/png', 'Slug': filename + ".png"}
-        r = requests.put(
-            url=cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
-            data=open(file_path + filename + ".png", 'rb'), 
-            headers=headers, 
-            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))
-
-#Updated once a day at 1am (UTC)
-if datetime.now().hour == 4 or update_all == True:
+#Updated once a day at 3am (UTC)
+if datetime.now().hour == 3 or update_all == True:
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
     # Weather for each site
@@ -559,7 +537,7 @@ if datetime.now().hour == 4 or update_all == True:
         df_prod['Date']=df_prod['Date'].dt.tz_convert('Europe/Paris')
         df_prod = df_prod.iloc[6:len(df_prod.index)-3] #remove first 6 and last 2 data points
         fig=plot_weather_hist(df_prod, df_prodGHI, "Historique meteo (" + cfg.df_sites.iloc[row]['SNAME'] +", " + cfg.df_sites.iloc[row]['CITY'] + ")")
-        save_figs_weather_day(fig, cfg.df_sites.iloc[row]['PREFIX'] + '_weather_hist')
+        save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + '_weather_hist')
 
 
 # 
@@ -659,20 +637,6 @@ def get_all_data(site):
     df_prod = pd.DataFrame(df_grouped)
     return df_prod
 
-def save_figs_all_data(fig, filename):
-    fig.write_image(file_path + filename + ".png",scale=2.5, width=900)   
-    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False))
-    fig.show(config=dict(locale='fr', displayModeBar=False))
-
-    #Upload on NextCloud
-    if cfg.NEXTCLOUD == True:
-        headers = {'Content-type': 'image/png', 'Slug': filename + ".png"}
-        r = requests.put(
-            url=cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
-            data=open(file_path + filename + ".png", 'rb'), 
-            headers=headers, 
-            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))
-
 def save_prod_hist_text_all(site, s, k, filename):
     text=''
     if int(site) == cfg.WD_ID:
@@ -683,10 +647,10 @@ def save_prod_hist_text_all(site, s, k, filename):
         text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
     file1 = open(file_path + filename + ".html","w")
     file1.write(text)
-    file1.close()
+    file1.close()  
 
 #uUdated once a day at 2am (UTC)
-if datetime.now().hour == 1 or update_all == True:
+if datetime.now().hour == 2 or update_all == True:
     #Total production for each site
     for row in range(0, len(cfg.df_sites)):
         df_prod=get_all_data(cfg.df_sites.iloc[row]['PREFIX'])
@@ -703,7 +667,7 @@ if datetime.now().hour == 1 or update_all == True:
         if cfg.df_sites.iloc[row]['PREFIX'] == "WD":
             df_prodWD = df_prod
         fig=plot_hist_prod_month(df_prod, "Historique (" + cfg.df_sites.iloc[row]['SNAME'] + ")", "Mois")  
-        save_figs_all_data(fig,cfg.df_sites.iloc[row]['PREFIX'] + "_all_data")
+        save_fig(fig,cfg.df_sites.iloc[row]['PREFIX'] + "_all_data")
         duration = (datetime.now()-cfg.df_sites.iloc[row]['DATEINST'])
         days = duration.days
         if cfg.df_sites.iloc[row]['PREFIX'] == "WD":
@@ -714,7 +678,7 @@ if datetime.now().hour == 1 or update_all == True:
 
     #All sites
     fig=plot_hist_prod_month_all(df_prodWD,df_prodJZ)
-    save_figs_all_data(fig,"All_data_all_sites")
+    save_fig(fig,"All_data_all_sites")
     kwh=round(df_prodWD['production_in_wh'].sum(),1) + round(df_prodJZ['production_in_wh'].sum(),1)
     EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * daysWD)   #inhabitant equivalent 
     save_prod_hist_text_all(-1,EH, kwh, "All-prod_hist_tex")
