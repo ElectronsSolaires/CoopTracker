@@ -7,7 +7,7 @@
 ##########################################################################################
 # CoopTracker
 # Copyright © 2021 Électrons solaires (https://www.electrons-solaires93.org/)
-# Contacts: Jeremie L, Jean-Marie B. (Électrons solaires, webmestre@electrons-solaires93.org)
+# Contacts: Jeremie L., Jean-Marie B. (Électrons solaires, webmestre@electrons-solaires93.org)
 # License: CC-BY-SA 4.0
 ##########################################################################################
 
@@ -29,7 +29,7 @@ import re
 import sys
 
 import config as cfg        #file containing API keys / credentials / configuration
-update_all = True          #update all plots (independently of scheduled updated)
+update_all = True           #update all plots (independently of scheduled updates)
 file_path = "./ES/"         #tell where local files are stored 
 
 
@@ -106,7 +106,7 @@ if datetime.now().hour == 3 or update_all == True:
             url=cfg.NEXTCLOUD_REPO + '/Latest/' + filename + ".png", 
             data=open(file_path + filename + ".png", 'rb'), 
             headers=headers, 
-            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))  
+            auth=(cfg.NEXTCLOUD_USERNAME, cfg.NEXTCLOUD_PASSWORD))
 
 
 # In[ ]:
@@ -165,7 +165,8 @@ def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
     return fig
 
 def plot_hist_prod_only(df_prod, titlename, col_time, col_time_text):
-    fig = go.Figure()
+    #fig = go.Figure()
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Bar(
             x=df_prod[col_time],
@@ -175,16 +176,30 @@ def plot_hist_prod_only(df_prod, titlename, col_time, col_time_text):
             hovertemplate =
             '<b>Date</b>: %{x} h'+
             '<br><b>Production</b>: %{y:.1f} kWh<br><extra></extra>'
-        ))
+        ), 
+        secondary_y=False)
+    fig.add_trace(
+        go.Bar(
+            x=df_prod[col_time],
+            y=df_prod['production_in_wh']/1000,
+            name="production (Wh)",
+            marker_color='rgb(108, 176, 65)',
+            hovertemplate =
+            '<b>Date</b>: %{x} h'+
+            '<br><b>Production</b>: %{y:.1f} kWh<br><extra></extra>'
+        ), 
+        secondary_y=True)
     fig.update_layout(legend=dict(
         orientation="h",
         yanchor="bottom",
         x=0,
         y=1
     ))
-    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
+    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=False)
     fig.update_xaxes(title_text = col_time_text)
-    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", side='left')
+    fig.update_yaxes(title_text="<b></b>", color="rgb(108, 176, 65)", secondary_y=True, side='right')
+    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", secondary_y=False, side='left')
+    
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
@@ -196,7 +211,7 @@ def save_prod_day_text(df, filename):
     text='<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Production du ' + day + '/' + month + '/' + year + ' : <b>' + str(round(s/1000)) + ' kWh</b></div></body></html>'
     file1 = open(file_path + filename + ".html","w")
     file1.write(text)
-    file1.close()
+    file1.close() 
         
 def fix_locale_htmlfile(filename):
     f = open(filename,'r')
@@ -301,8 +316,8 @@ def prod_hist(start_date, end_date, days):
         fig=plot_hist_prod_only(df_prod, "Historique " + str(days) + " derniers jours de production ("+cfg.df_sites.iloc[row]['SNAME']+", +"+cfg.df_sites.iloc[row]['CITY']+"+)", col_time, col_time_text)
         fig=save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_" + str(days))        
 
-#updated once a day at 4am
-if datetime.now().hour == 4 or update_all == True:
+#updated once a day at 2am
+if datetime.now().hour == 2 or update_all == True:
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
     prod_hist(start_date, end_date, 3)
@@ -373,7 +388,7 @@ def save_prod_hist_text(site, s, k, d, filename):
     if int(site) == cfg.WD_ID:
         text='<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"> <div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur les ' + str(d) + ' derniers jours <a target="_parent" href="https://www.electrons-solaires93.org/productionwaldeckrousseau/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
     elif int(site) == cfg.JZ_ID:
-        text='<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"> <div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur les ' + str(d) + ' derniers jours <a target="_parent" href="https://www.electrons-solaires93.org/productionjeanzay/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'    
+        text='<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"> <div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur les ' + str(d) + ' derniers jours <a target="_parent" href="https://www.electrons-solaires93.org/productionjeanzay/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
     file1 = open(file_path + filename + ".html","w")
     file1.write(text)
     file1.close()
@@ -550,7 +565,7 @@ if datetime.now().hour == 3 or update_all == True:
 #    - From daily data stored as JSON files
 #########################################################################
 def plot_hist_prod_month(df_prod, titlename, xlabel):
-    fig = go.Figure()
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
         go.Bar(
             x=df_prod['Date'],
@@ -560,20 +575,31 @@ def plot_hist_prod_month(df_prod, titlename, xlabel):
             hovertemplate =
             '<b>Date</b>: %{x}'+
             '<br><b>Production</b>: %{y:.1f} MWh<br><extra></extra>'
-        )
-    )
+        ),secondary_y=False)
+    fig.add_trace(
+        go.Bar(
+            x=df_prod['Date'],
+            y=df_prod['production_in_wh']/1000000,
+            name="production (Wh)",
+            marker_color='rgb(108, 176, 65)',
+            hovertemplate =
+            '<b>Date</b>: %{x}'+
+            '<br><b>Production</b>: %{y:.1f} MWh<br><extra></extra>'
+        ),secondary_y=True)
     fig.update_layout(legend=dict(
         orientation="h",
         yanchor="bottom",
         x=0,
         y=1
     ))
-    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
+    fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=False)
     fig.update_xaxes(title_text = xlabel)
 
     # Set y-axes titles
     fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")
-    fig.update_yaxes(title_text="<b>Production (MWh)</b>", color="rgb(108, 176, 65)")
+    fig.update_yaxes(title_text="<b></b>", color="rgb(108, 176, 65)", secondary_y=True, side='right')
+    fig.update_yaxes(title_text="<b>Production (kWh)</b>", color="rgb(108, 176, 65)", secondary_y=False, side='left')
+  
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
@@ -647,10 +673,10 @@ def save_prod_hist_text_all(site, s, k, filename):
         text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
     file1 = open(file_path + filename + ".html","w")
     file1.write(text)
-    file1.close()  
+    file1.close()
 
-#uUdated once a day at 2am (UTC)
-if datetime.now().hour == 2 or update_all == True:
+#uUdated once a day at 4am (UTC)
+if datetime.now().hour == 4 or update_all == True:
     #Total production for each site
     for row in range(0, len(cfg.df_sites)):
         df_prod=get_all_data(cfg.df_sites.iloc[row]['PREFIX'])
