@@ -43,6 +43,8 @@ CoopTracker
 └───src
     └───cooptracker.py and .ipynb -> Jupyter Notebook et le fichier .py correspondant
     └───config.py -> Contient les clés, accés et paramètres de configuration
+    └───cooptracker_EP.py and .ipynb -> Jupyter Notebook et le fichier .py correspondant
+    └───config_EP.py -> Contient les clés, accés et paramètres de configuration
 └───ES -> données d'entrée spécifiques pour Electrons Solaires
     └───93.geojson -> Polygones pour les villes de Seine Saint-Denis (93)
     └───idf.geojson -> Polygones pour les villes de Ile de France    
