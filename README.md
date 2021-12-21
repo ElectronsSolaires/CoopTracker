@@ -47,6 +47,12 @@ CoopTracker
     └───93.geojson -> Polygones pour les villes de Seine Saint-Denis (93)
     └───idf.geojson -> Polygones pour les villes de Ile de France    
     └───convert.py -> Utilitaire pour extraire les données geojson
+└───EP -> données d'entrée spécifiques aux centrales d'Ile de France soutenues par Energie Partagée
+    └───93.geojson -> Polygones pour les villes de Seine Saint-Denis (93)
+    └───94.geojson -> Polygones pour les villes du Val de Marne (94)
+    └───IDF_filtered.geojson -> Polygones pour les villes de Ile de France (Paris, 93 et 94)  
+    └───arrondissements.geojson -> Polygones pour les arrondissements de Paris
+    └───cooperatives.csv -> descriptions de l'implantation géographique des coopératives 
 ```
 
 ### Configuration
