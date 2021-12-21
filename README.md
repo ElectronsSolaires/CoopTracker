@@ -23,6 +23,7 @@ Vous trouverez des exemples de rendu ici:
 
 Voici des exemples pour les coopératives d'Ile de France avec le soutien d'[Energie Partagée](https://energie-partagee.org):
 - http://185.217.152.88/IDF/
+
 Le tableau de bord présente des données des [Electrons Solaires](https://www.electrons-solaires93.org), de [EnerCit'IF](https://enercitif.org), de [Plaine Energie Citoyenne](https://www.plaine-energie-citoyenne.fr) et de [Sud Paris Soleil](https://sudparis-soleil.fr)
 
 ## Licence
