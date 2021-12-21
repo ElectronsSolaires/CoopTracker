@@ -73,6 +73,3 @@ Pour utiliser CoopTracker, vous devez suivre les étapes suivantes:
 Le code est la doc. Mais si vous avez des questions / des suggestions, ou si vous souhaitez contribuer, vous pouvez nous contacter ici:
 - webmestre@electrons-solaires93.org
 
-### TODO
-
-- Archiver les JSON journaliers en local au lieu de NextCloud
