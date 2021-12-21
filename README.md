@@ -11,11 +11,19 @@ Puis il produit des graphiques et du texte sur :
 - l'historique météo 
 - la répartition géographique des sociétaires
 
+Le code existe en deux versions:
+- pour une coopérative, par exemple les Electrons Solaires (cooptracker.py)
+- pour un ensemble de coopératives, par exemple celles d'Ile de France (cooptracker_EP.py)
+
 Vous trouverez des exemples de rendu ici:
 - https://www.electrons-solaires93.org/
 - https://www.electrons-solaires93.org/productionwaldeckrousseau/
 - https://www.electrons-solaires93.org/productionjeanzay/
 - https://www.electrons-solaires93.org/devenir-societaire/ (carte des sociétaires)
+
+Voici des exemples pour les coopératives d'Ile de France avec le soutien d'[Energie Partagée](https://energie-partagee.org):
+- http://185.217.152.88/IDF/
+Le tableau de bord présente des données des [Electrons Solaires](https://www.electrons-solaires93.org), de [EnerCit'IF](https://enercitif.org), de [Plaine Energie Citoyenne](https://www.plaine-energie-citoyenne.fr) et de [Sud Paris Soleil](https://sudparis-soleil.fr)
 
 ## Licence
 Tout le contenu est sous licence [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
