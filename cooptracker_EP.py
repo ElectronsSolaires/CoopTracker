@@ -755,6 +755,12 @@ def plot_hist_prod_month_all():
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
+def save_prod_hist_text_all(site, s, k, filename):
+    text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
+    file1 = open(file_path + filename + ".html","w", encoding='utf8')
+    file1.write(text)
+    file1.close() 
+
 #uUdated once a day at 4am (UTC)
 if datetime.now().hour == 4 or update_all == True:
     #Total production for each site
@@ -773,6 +779,13 @@ if datetime.now().hour == 4 or update_all == True:
             df_prod['production_in_wh'] = pd.to_numeric(df_prod['production_in_wh'], downcast="float")
         fig=plot_hist_prod_month(df_prod, "Historique (" + cfg.df_sites.iloc[row]['SNAME'] + ")", "Mois")  
         save_fig(fig,cfg.df_sites.iloc[row]['PREFIX'] + "_all_data")
+        duration = (datetime.now()-cfg.df_sites.iloc[row]['DATEINST'])
+        days = duration.days
+        kwh=round(df_prod['production_in_wh'].sum(),1)
+        EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
+        save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
+
+
         if float(cfg.df_sites.iloc[row]['PeakPW']) < 40 :
             fig_all_small.add_trace(
                 go.Bar(
