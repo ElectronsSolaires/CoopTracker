@@ -94,7 +94,8 @@ if datetime.now().hour == 3 or update_all == True:
         yanchor="top",
         y=0.99,
         xanchor="left",
-        x=0.01
+        x=0.01,
+        bgcolor="rgba(0,0,0,0)"
     ))
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     fig.update_geos(fitbounds="locations")  
@@ -162,8 +163,10 @@ def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
             '<br><b>Production</b>: %{y:.1f} kWh<br><extra></extra>'
         ), 
         secondary_y=False)
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     #fig.update_layout(title_text=titlename)
-    fig.update_layout(legend=dict(orientation="h",yanchor="bottom",x=0,y=1))
+    fig.update_layout(legend=dict(orientation="h",yanchor="bottom",bgcolor="rgba(0,0,0,0)", x=0,y=1))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
     fig.update_yaxes(title_text="<b>Ensoleillement (W/m2)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='right')
@@ -200,8 +203,11 @@ def plot_hist_prod_only(df_prod, titlename, col_time, col_time_text):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=False)
     fig.update_xaxes(title_text = col_time_text)
     fig.update_yaxes(title_text="<b></b>", color="rgb(108, 176, 65)", secondary_y=True, side='right')
@@ -383,8 +389,11 @@ def plot_hist_prod_day(df_prod, titlename, col_time, col_time_text):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
     fig.update_yaxes(title_text="<b>Equivalent (habitants)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='right')
@@ -420,7 +429,7 @@ def plot_hist_prod_unhabitants():
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=True)
     fig.update_layout(yaxis_title='', xaxis_title='')
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
-    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", x=0, y=1))
+    fig.update_layout(legend=dict(orientation="h", yanchor="bottom",bgcolor="rgba(0,0,0,0)", x=0, y=1))
     return fig
 
 def prod_hist_day(start_date, end_date, days):
@@ -511,7 +520,8 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
             '<br><b>Nébulosité</b>: %{y:.1f} %<br><extra></extra>'
             #legendgroup = '1'
         ),secondary_y=False)# row=1, col=1)
-
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     #fig.update_xaxes(title_text = 'Jours', row=1, col=1)
     fig.update_yaxes(title_text="<b>Ensoleilement (W/m2)</b>",  color="rgb(37, 64, 143)", secondary_y=True, side='right')# row=1, col=1)
     fig.update_yaxes(title_text="<b>Nébulosité (%)</b>", color="red", secondary_y=False, side='left')# row=1, col=1)
@@ -542,7 +552,8 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
     #fig.update_layout(title_text=titlename)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
@@ -599,8 +610,11 @@ def plot_hist_prod_month(df_prod, titlename, xlabel):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=False)
     fig.update_xaxes(title_text = xlabel)
 
@@ -636,7 +650,9 @@ def plot_hist_prod_month_all(df_prodWD, df_prodJZ):
             '<br><b>Production</b>: %{y:.1f} MWh<br><extra></extra>'
         )
     )   
-    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", x=0, y=1))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
+    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)",x=0, y=1))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text='')
     fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")
@@ -688,7 +704,8 @@ def save_prod_hist_text_all(site, s, k, filename):
     elif int(site) == cfg.JZ_ID:
         text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/productionjeanzay/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'    
     else:
-        text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
+        #text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">' + round(str(k/1000000),1) + ' MWh correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
+        text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><h4 style="color:#6CB041">' + str(round(k/1000000,1) + ' MWh </h4></body></html>'
     file1 = open(file_path + filename + ".html","w", encoding='utf8')
     file1.write(text)
     file1.close() 
@@ -719,6 +736,7 @@ if datetime.now().hour == 4 or update_all == True:
         kwh=round(df_prod['production_in_wh'].sum(),1)
         EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
+        #save_prod_hist_text_all(-1, EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
 
     #All sites
     fig=plot_hist_prod_month_all(df_prodWD,df_prodJZ)

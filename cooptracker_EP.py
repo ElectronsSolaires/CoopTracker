@@ -45,7 +45,7 @@ prod_file_path = "./Raw/"      #tell where production files are stored
 # Table with characteristics of all sites
 #########################################################################
 df=cfg.df_sites.sort_values(by='COOP', ascending=True)
-text = '<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea"><table>'
+text = '<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea"><table><tr><td><b>Code</b></td><td><b>Cooperative</b></td><td><b>Site</b></td><td><b>Adresse</b></td><td><b>Installation</b></td><td><b>Puissance</b></td></tr>'
 for row in range(0, len(df)): 
     text = text + '<tr><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td>' +  df.iloc[row]['PeakPW']  + ' kWc</td><td><a target="_blank" href="' +  df.iloc[row]['PREFIX'] + '/">production</a></td></tr>' 
 text = text + '</div><table></body></html>' 
@@ -127,7 +127,8 @@ def plot_map_societaires(geo_json, csv, df_sites, coopname, filename, lat_map, l
         yanchor="top",
         y=0.99,
         xanchor="left",
-        x=0.01
+        x=0.01,
+        bgcolor="rgba(0,0,0,0)"
     ))
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     fig.update_geos(fitbounds="locations")  
@@ -182,7 +183,8 @@ def plot_map_cooperatives(geo_json, csv, df_sites, filename, lat_map, lon_map):
         yanchor="top",
         y=0.99,
         xanchor="left",
-        x=0.01
+        x=0.01,
+        bgcolor="rgba(0,0,0,0)"
     ))
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     fig.update_geos(fitbounds="locations")  
@@ -246,8 +248,10 @@ def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
             '<br><b>Production</b>: %{y:.1f} kWh<br><extra></extra>'
         ), 
         secondary_y=False)
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     #fig.update_layout(title_text=titlename)
-    fig.update_layout(legend=dict(orientation="h",yanchor="bottom",x=0,y=1))
+    fig.update_layout(legend=dict(orientation="h",yanchor="bottom",bgcolor="rgba(0,0,0,0)",x=0,y=1))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
     fig.update_yaxes(title_text="<b>Ensoleillement (W/m2)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='right')
@@ -284,8 +288,11 @@ def plot_hist_prod_only(df_prod, titlename, col_time, col_time_text):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1, 
+        bgcolor="rgba(0,0,0,0)"
     ))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=False)
     fig.update_xaxes(title_text = col_time_text)
     fig.update_yaxes(title_text="<b></b>", color="rgb(108, 176, 65)", secondary_y=True, side='right')
@@ -313,6 +320,7 @@ def fix_locale_htmlfile(filename):
     f.close()   
 
 def save_fig(fig, filename):
+    fig.update_layout(paper_bgcolor="rgb(0,0,0,0)")
     fig.write_image(file_path + filename + ".png",scale=2.5, width=900)   
     plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False))
     fix_locale_htmlfile(file_path + filename + ".html")
@@ -481,8 +489,11 @@ def plot_hist_prod_day(df_prod, titlename, col_time, col_time_text):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text = col_time_text)
     fig.update_yaxes(title_text="<b>Equivalent (habitants)</b>", color="rgb(37, 64, 143)", secondary_y=True, side='right')
@@ -514,7 +525,7 @@ def plot_hist_prod_unhabitants():
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=True)
     fig.update_layout(yaxis_title='', xaxis_title='')
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
-    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", x=0, y=1))
+    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)", x=0, y=1))
     return fig
 
 def prod_hist_day(start_date, end_date, days):
@@ -550,7 +561,7 @@ def prod_hist_day(start_date, end_date, days):
     fig=plot_hist_prod_unhabitants()
     save_fig(fig,"prod_hist_unhabitants")
 
-#updates once a day at 5am (UTC)
+#updates once a day at 4am (UTC)
 if datetime.now().hour == 4 or update_all == True:
     thrity_days_ago = datetime.now() - timedelta(days=30)
     start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
@@ -607,7 +618,8 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
             '<b>Date</b>: %{x} h'+
             '<br><b>Nébulosité</b>: %{y:.1f} %<br><extra></extra>'
         ),secondary_y=False)# row=1, col=1)
-
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     #fig.update_xaxes(title_text = 'Jours', row=1, col=1)
     fig.update_yaxes(title_text="<b>Ensoleilement (W/m2)</b>",  color="rgb(37, 64, 143)", secondary_y=True, side='right')# row=1, col=1)
     fig.update_yaxes(title_text="<b>Nébulosité (%)</b>", color="red", secondary_y=False, side='left')# row=1, col=1)
@@ -616,7 +628,8 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
     #fig.update_layout(title_text=titlename)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
@@ -673,8 +686,11 @@ def plot_hist_prod_month(df_prod, titlename, xlabel):
         orientation="h",
         yanchor="bottom",
         x=0,
-        y=1
+        y=1,
+        bgcolor="rgba(0,0,0,0)"
     ))
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0), showlegend=False)
     fig.update_xaxes(title_text = xlabel)
 
@@ -746,14 +762,17 @@ def plot_hist_prod_month_all():
             '<b>Date</b>: %{x}'+
             '<br><b>Production</b>: %{y:.1f} MWh<br><extra></extra>'
         )
-    )   
-    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", x=0, y=1))
+    )  
+    fig.update_xaxes(showgrid=False)
+    fig.update_yaxes(showgrid=False)
+    fig.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)",x=0, y=1))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text='')
     fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")
     fig.update_yaxes(title_text="<b>Production (MWh)</b>", color="rgb(136, 136, 136)")
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
+
 
 def save_prod_hist_text_all(site, s, k, filename):
     text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
@@ -815,9 +834,13 @@ if datetime.now().hour == 4 or update_all == True:
             df_prodAll = df_prod
         else:
             df_prodAll = df_prodAll.append(df_prod)
-        
+    fig_all_small.update_xaxes(showgrid=False)
+    fig_all_small.update_yaxes(showgrid=False)
+    fig_all_large.update_xaxes(showgrid=False)
+    fig_all_large.update_yaxes(showgrid=False)
+    
     #All small sites (histograms side by side)
-    fig_all_small.update_layout(legend=dict(orientation="h", yanchor="bottom", x=0, y=1))
+    fig_all_small.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)", x=0, y=1))
     fig_all_small.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig_all_small.update_xaxes(title_text='')
     fig_all_small.update_xaxes(dtick="M1", tickformat="%b\n%Y")
@@ -826,7 +849,7 @@ if datetime.now().hour == 4 or update_all == True:
     save_fig(fig_all_small,"All_data_all_small_sitesIDF")
     
     #All large_small sites (histograms side by side)
-    fig_all_large.update_layout(legend=dict(orientation="h", yanchor="bottom", x=0, y=1))
+    fig_all_large.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)", x=0, y=1))
     fig_all_large.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig_all_large.update_xaxes(title_text='')
     fig_all_large.update_xaxes(dtick="M1", tickformat="%b\n%Y")
