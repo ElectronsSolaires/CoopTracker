@@ -780,7 +780,7 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1.write(text)
     file1.close() 
 
-#uUdated once a day at 4am (UTC)
+#Updated once a day at 4am (UTC)
 if datetime.now().hour == 4 or update_all == True:
     #Total production for each site
     fig_all_small = go.Figure()
@@ -862,6 +862,65 @@ if datetime.now().hour == 4 or update_all == True:
     df_prodAll = pd.DataFrame(df_grouped)
     fig=plot_hist_prod_month(df_prodAll, "Historique (tous les sites)", "Mois")  
     save_fig(fig, "All_data_all_sitesIDF_cumulated")
+
+
+# In[ ]:
+
+
+#########################################################################
+# Extra text for IDF dashboard
+#########################################################################
+
+#prod total
+for row in range(0, len(cfg.df_sites)):
+    df_prod=get_all_data(cfg.df_sites.iloc[row]['PREFIX'])
+    if row == 0:
+        df_prodAll = df_prod
+    else:
+        df_prodAll = df_prodAll.append(df_prod)
+prod_total = df_prodAll['production_in_wh'].sum()
+
+# prod yesterday
+thrity_days_ago = datetime.now() - timedelta(days=1)
+start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
+for row in range(0, len(cfg.df_sites)):
+    df_prod=get_data_prod_hist_day(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'])
+    if row == 0:
+        df_prodAll = df_prod
+    else:
+        df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh']
+prod_yesterday = df_prodAll['production_in_wh'].sum()
+
+# prod 30 days
+thrity_days_ago = datetime.now() - timedelta(days=30)
+start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
+for row in range(0, len(cfg.df_sites)):
+    df_prod=get_data_prod_hist_day(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'])
+    if row == 0:
+        df_prodAll = df_prod
+    else:
+        df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh']
+prod_month = df_prodAll['production_in_wh'].sum()
+
+# prod today
+for row in range(0, len(cfg.df_sites)):
+    df_prod=get_data_prod_day(cfg.df_sites.iloc[row]['EPID'],d, cfg.df_sites.iloc[row]['PREFIX'])
+    if row == 0:
+        df_prodAll=df_prod
+    df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh'] 
+prod_today = df_prodAll['production_in_wh'].sum();
+    
+filename = "Dashboard-prod-today-yesterday-month"
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">- ce jour : ' + str(round(prod_today/1000,1)) + ' KWh<br>- hier : ' + str(round(prod_yesterday/1000,1)) + ' KWh<br>- ce mois-ci : ' + str(round(prod_month/1000000,1)) + ' MWh<br>- centrales en service : ' + str(len(cfg.df_sites)) + '</div></body></html>'
+file1 = open(file_path + filename + ".html","w", encoding='utf8')
+file1.write(text)
+file1.close() 
+
+filename = "Dashboard-prod-since-origin"
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Production cumulée de toutes les centrales : ' + str(round(prod_total/1000000,1) + ' MWh</div></body></html>'
+file1 = open(file_path + filename + ".html","w", encoding='utf8')
+file1.write(text)
+file1.close() 
 
 
 # In[ ]:
