@@ -804,7 +804,16 @@ if datetime.now().hour == 4 or update_all == True:
         EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
 
+        #filter dates (histogram over a 1 year window)
+        a_year_ago = datetime.now() - timedelta(days=365)
+        start_d = "{0}-{1:02}".format(a_year_ago.year-2000, a_year_ago.month)
+        end_d = "{0}-{1:02}".format(datetime.now().year-2000, datetime.now().month)        
+        after_start_date = df_prod['Date'] > start_d
+        before_end_date = df_prod['Date'] <= end_d
+        between_two_dates = after_start_date & before_end_date
+        df_prod = df_prod.loc[between_two_dates]
 
+        
         if float(cfg.df_sites.iloc[row]['PeakPW']) < 40 :
             fig_all_small.add_trace(
                 go.Bar(
@@ -917,7 +926,7 @@ file1.write(text)
 file1.close() 
 
 filename = "Dashboard-prod-since-origin"
-text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Production cumulée de toutes les centrales : ' + str(round(prod_total/1000000,1) + ' MWh</div></body></html>'
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><h3 style="color:#6CB041">Production cumulée de toutes les centrales : ' + str(round(prod_total/1000000,1) + ' MWh<span>&#42;</span></h3></body></html>'
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close() 
