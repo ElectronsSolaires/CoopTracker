@@ -749,5 +749,48 @@ if datetime.now().hour == 4 or update_all == True:
 # In[ ]:
 
 
+#############################################################
+# Content for monthly publishing (social networks...)
+#############################################################
+if datetime.now().hour == 4 or update_all == True:
+    today = datetime.now()
+    end_lastMonth = today.replace(day=1)
+    start_lastMonth = (end_lastMonth - timedelta(days=1)).replace(day=1)    
+    end_lastMonth = date(end_lastMonth.year, end_lastMonth.month, end_lastMonth.day)
+    start_lastMonth = date(start_lastMonth.year, start_lastMonth.month, start_lastMonth.day)
+    month = start_lastMonth.strftime("%Y-%m")
+    col_time = 'Date'
+    col_time_text = 'Jours'
+    kwhAll = 0
+    #Production of each site
+    for row in range(0, len(cfg.df_sites)):
+        for single_date in daterange(start_lastMonth, end_lastMonth):
+            d = single_date.strftime("%Y-%m-%d")
+            each_file = "{0}-{1}-prod.json".format(cfg.df_sites.iloc[row]['PREFIX'],d)
+            with open(prod_file_path + each_file) as response:
+                prod = json.load(response)
+                df_prod = df_prod.append(prod['site_hourly_production']['hourly_productions'])
+        df_prod['utc_timestamps_Paris'] = pd.to_datetime(df_prod['utc_timestamps'])
+        df_prod['utc_timestamps_Paris']=df_prod['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
+        df_prod['Date'] = df_prod['utc_timestamps_Paris'].dt.strftime('%y-%m-%d')
+        df_grouped=df_prod.groupby('Date').sum().reset_index()
+        df_prod = pd.DataFrame(df_grouped)
+        kwh=round(df_prod['production_in_wh'].sum(),1)
+        if row == 0:
+            df_prodAll = df_prod
+        else:
+            df_prodAll['production_in_wh']  = df_prodAll['production_in_wh'] + df_prod['production_in_wh']
+        kwhAll = kwhAll + kwh
+    #Total production for all sites
+    df_prodAll['total_production_in_wh'] = df_prodAll['production_in_wh']
+    df_prodAll['unhabitants_equivalents'] = df_prodAll['production_in_wh'] / (float(cfg.EH_WhPerYear)/365.0)
+    fig=plot_hist_prod_day(df_prodAll.dropna(how='any'), "Historique de production", col_time, col_time_text)
+    save_fig(fig, "All-prod_hist_last_month") 
+
+    filename = "All-prod_hist_last_month_text"
+    text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea"><h3 style="color:#6CB041">Production du mois ' + month + ' : ' + str(round(kwhAll/1000000,1)) + ' MWh</h3><iframe scrolling="no" style="height:400px; width: 600px"  frameborder="0"  src="All-prod_hist_last_month.html">Browser not compatible.</iframe></div></body></html>'
+    file1 = open(file_path + filename + ".html","w", encoding='utf8')
+    file1.write(text)
+    file1.close() 
 
 
