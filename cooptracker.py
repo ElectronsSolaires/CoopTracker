@@ -763,7 +763,9 @@ if datetime.now().hour == 4 or update_all == True:
     col_time_text = 'Jours'
     kwhAll = 0
     #Production of each site
+    df_prodAll = pd.DataFrame()
     for row in range(0, len(cfg.df_sites)):
+        df_prod = pd.DataFrame()
         for single_date in daterange(start_lastMonth, end_lastMonth):
             d = single_date.strftime("%Y-%m-%d")
             each_file = "{0}-{1}-prod.json".format(cfg.df_sites.iloc[row]['PREFIX'],d)

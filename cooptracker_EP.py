@@ -887,7 +887,7 @@ for row in range(0, len(cfg.df_sites)):
         df_prodAll = df_prod
     else:
         df_prodAll = df_prodAll.append(df_prod)
-prod_total = df_prodAll['production_in_wh'].sum()
+prod_total = df_prodAll['production_in_wh'].sum(skipna = True)
 
 # prod yesterday
 thrity_days_ago = datetime.now() - timedelta(days=1)
@@ -897,8 +897,8 @@ for row in range(0, len(cfg.df_sites)):
     if row == 0:
         df_prodAll = df_prod
     else:
-        df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh']
-prod_yesterday = df_prodAll['production_in_wh'].sum()
+        df_prodAll = df_prodAll.append(df_prod) 
+prod_yesterday = df_prodAll['production_in_wh'].sum(skipna = True)
 
 # prod 30 days
 thrity_days_ago = datetime.now() - timedelta(days=30)
@@ -908,19 +908,20 @@ for row in range(0, len(cfg.df_sites)):
     if row == 0:
         df_prodAll = df_prod
     else:
-        df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh']
-prod_month = df_prodAll['production_in_wh'].sum()
+        df_prodAll = df_prodAll.append(df_prod) 
+prod_month = df_prodAll['production_in_wh'].sum(skipna = True)
 
 # prod today
 for row in range(0, len(cfg.df_sites)):
     df_prod=get_data_prod_day(cfg.df_sites.iloc[row]['EPID'],d, cfg.df_sites.iloc[row]['PREFIX'])
     if row == 0:
         df_prodAll=df_prod
-    df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh'] 
-prod_today = df_prodAll['production_in_wh'].sum();
+    else:
+        df_prodAll = df_prodAll.append(df_prod) 
+prod_today = df_prodAll['production_in_wh'].sum(skipna = True);
     
 filename = "Dashboard-prod-today-yesterday-month"
-text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">- ce jour : ' + str(round(prod_today/1000,1)) + ' KWh<br>- hier : ' + str(round(prod_yesterday/1000,1)) + ' KWh<br>- ce mois-ci : ' + str(round(prod_month/1000000,1)) + ' MWh<br>- centrales en service : ' + str(len(cfg.df_sites)) + '</div></body></html>'
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">- ce jour : ' + str(round(prod_today/1000,1)) + ' KWh<br>- hier : ' + str(round(prod_yesterday/1000,1)) + ' KWh<br>- 30 derniers jours : ' + str(round(prod_month/1000000,1)) + ' MWh<br>- centrales en service : ' + str(len(cfg.df_sites)) + '</div></body></html>'
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close() 
