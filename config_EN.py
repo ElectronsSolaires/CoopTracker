@@ -9,15 +9,16 @@
 import locale
 import pandas as pd
 from datetime import datetime
+import auth as auth
 
-mapbox_access_token = ''
+mapbox_access_token = auth.mapbox_access_token
 locale.setlocale(locale.LC_ALL, 'fr_FR')
 NEXTCLOUD = False
 NEXTCLOUD_USERNAME = ''
 NEXTCLOUD_PASSWORD = ''
 NEXTCLOUD_REPO= ''
-token_epice = {'Authorization' : 'Token xhn...'}
-APIK_OWM=''
+token_epice = auth.token_epice
+APIK_OWM=auth.APIK_OWM
 EH_WhPerYear = 1465000 #inhabitant equivalent (1465 kWH / habitant / year)
 
 

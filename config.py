@@ -8,17 +8,18 @@
 
 import locale
 import pandas as pd
-from datetime import datetime, date, timedelta
+from datetime import datetime
+import auth as auth
 
-mapbox_access_token = 'XXXXX'
+mapbox_access_token = auth.mapbox_access_token
 locale.setlocale(locale.LC_ALL, 'fr_FR')
 NEXTCLOUD = False
 NEXTCLOUD_USERNAME = ''
 NEXTCLOUD_PASSWORD = ''
 NEXTCLOUD_REPO= ''
-token_epice = {'Authorization' : 'Token XXXXX'}
-APIK_OWM='XXXXX'
-WR_ID=1639 # Waldeck-Rousseau/1639
+token_epice = auth.token_epice
+APIK_OWM=auth.APIK_OWM
+WD_IR=1639 # Waldeck-Rousseau/1639
 JZ_ID=4737 # Jean Zay/4737
 ESCSS = 'https://www.electrons-solaires93.org/wp-content/themes/ample-pro/style.css'
 CSV_SOCIETARIES = 'https://www.electrons-solaires93.org/data/societaires.csv'

@@ -10,16 +10,17 @@
 
 import locale
 import pandas as pd
-from datetime import datetime, date, timedelta
+from datetime import datetime
+import auth as auth
 
-mapbox_access_token = 'XXXXX'
+mapbox_access_token = auth.mapbox_access_token
 locale.setlocale(locale.LC_ALL, 'fr_FR')
 NEXTCLOUD = False
 NEXTCLOUD_USERNAME = ''
 NEXTCLOUD_PASSWORD = ''
 NEXTCLOUD_REPO= ''
-token_epice = {'Authorization' : 'Token XXXXX'}
-APIK_OWM='XXXXX'
+token_epice =  auth.token_epice
+APIK_OWM=auth.APIK_OWM
 ESCSS = 'https://www.electrons-solaires93.org/wp-content/themes/ample-pro/style.css'
 CSV_COOPS = 'cooperatives.csv'
 GEOJSON_DATA_IDF = "IDF_filtered.geojson"
