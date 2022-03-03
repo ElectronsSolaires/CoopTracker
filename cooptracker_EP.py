@@ -743,8 +743,8 @@ def plot_hist_prod_month_all():
     fig = go.Figure()
     fig.add_trace(
         go.Bar(
-            x=df_prodWD['Date'],
-            y=df_prodWD['production_in_wh']/1000000,
+            x=df_prodWR['Date'],
+            y=df_prodWR['production_in_wh']/1000000,
             name="Waldeck-Rousseau",
             marker_color='rgb(108, 176, 65)',
             hovertemplate =

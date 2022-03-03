@@ -311,7 +311,7 @@ def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud):
         f.close()  
     return df_prod
 
-def prod_hist(start_date, end_date, days):
+7
     if days == 30:
         col_time = 'Date'
         col_time_text = 'Jours'
@@ -403,7 +403,7 @@ def plot_hist_prod_day(df_prod, titlename, col_time, col_time_text):
 
 def save_prod_hist_text(site, s, k, d, filename):
     text=""
-    if int(site) == cfg.WD_ID:
+    if int(site) == cfg.WR_ID:
         text='<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"> <div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur les ' + str(d) + ' derniers jours <a target="_parent" href="https://www.electrons-solaires93.org/productionwaldeckrousseau/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
     elif int(site) == cfg.JZ_ID:
         text='<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"> <div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur les ' + str(d) + ' derniers jours <a target="_parent" href="https://www.electrons-solaires93.org/productionjeanzay/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'    
@@ -626,12 +626,12 @@ def plot_hist_prod_month(df_prod, titlename, xlabel):
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     return fig
 
-def plot_hist_prod_month_all(df_prodWD, df_prodJZ):
+def plot_hist_prod_month_all(df_prodWR, df_prodJZ):
     fig = go.Figure()
     fig.add_trace(
         go.Bar(
-            x=df_prodWD['Date'],
-            y=df_prodWD['production_in_wh']/1000000,
+            x=df_prodWR['Date'],
+            y=df_prodWR['production_in_wh']/1000000,
             name="Waldeck-Rousseau",
             marker_color='rgb(108, 176, 65)',
             hovertemplate =
@@ -699,7 +699,7 @@ def get_all_data(site):
 
 def save_prod_hist_text_all(site, s, k, filename):
     text=''
-    if int(site) == cfg.WD_ID:
+    if int(site) == cfg.WR_ID:
         text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/productionwaldeckrousseau/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'
     elif int(site) == cfg.JZ_ID:
         text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">Cette production correspond à la consommation hors chauffage et eau chaude sanitaire de ' + str(round(s/2.4)) + ' foyers, soit ' + str(round(s)) + ' habitants, sur la même période <a target="_parent" href="https://www.electrons-solaires93.org/productionjeanzay/#Explication_conso_moyenne">(*)</a>.</p></div></body></html>'    
@@ -725,24 +725,24 @@ if datetime.now().hour == 4 or update_all == True:
             df_prod.loc[i,"production_in_wh"]=df_prod.loc[i,"production_in_wh"]+1600000 #3 days
             df_prod['production_in_wh'] = pd.to_numeric(df_prod['production_in_wh'], downcast="float")
             df_prodJZ = df_prod
-        if cfg.df_sites.iloc[row]['PREFIX'] == "WD":
-            df_prodWD = df_prod
+        if cfg.df_sites.iloc[row]['PREFIX'] == "WR":
+            df_prodWR = df_prod
         fig=plot_hist_prod_month(df_prod, "Historique (" + cfg.df_sites.iloc[row]['SNAME'] + ")", "Mois")  
         save_fig(fig,cfg.df_sites.iloc[row]['PREFIX'] + "_all_data")
         duration = (datetime.now()-cfg.df_sites.iloc[row]['DATEINST'])
         days = duration.days
-        if cfg.df_sites.iloc[row]['PREFIX'] == "WD":
-            daysWD =days
+        if cfg.df_sites.iloc[row]['PREFIX'] == "WR":
+            daysWR =days
         kwh=round(df_prod['production_in_wh'].sum(),1)
         EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
         #save_prod_hist_text_all(-1, EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
 
     #All sites
-    fig=plot_hist_prod_month_all(df_prodWD,df_prodJZ)
+    fig=plot_hist_prod_month_all(df_prodWR,df_prodJZ)
     save_fig(fig,"All_data_all_sites")
-    kwh=round(df_prodWD['production_in_wh'].sum(),1) + round(df_prodJZ['production_in_wh'].sum(),1)
-    EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * daysWD)   #inhabitant equivalent 
+    kwh=round(df_prodWR['production_in_wh'].sum(),1) + round(df_prodJZ['production_in_wh'].sum(),1)
+    EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * daysWR)   #inhabitant equivalent 
     save_prod_hist_text_all(-1,EH, kwh, "All-prod_hist_tex")
 
 
