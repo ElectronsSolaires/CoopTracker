@@ -15,6 +15,7 @@ def fix_locale_htmlfile(filename):
     f.close()
 
 def save_fig(fig, filename,file_path):
+    fig.update_layout(paper_bgcolor="rgb(0,0,0,0)")
     fig.write_image(file_path + filename + ".png",scale=2.5, width=900)
     plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn', config=dict(locale='fr', displayModeBar=False))
     fix_locale_htmlfile(file_path + filename + ".html")
