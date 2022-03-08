@@ -26,6 +26,8 @@ def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud,prod
         d = single_date.strftime("%Y-%m-%d")
         print("Getting data from epice for date "+d+" date site "+ site)
         response = requests.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+str(site)+'&date=' + d, headers=cfg.token_epice)
+        if(response.status_code != 200):
+            raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
         j = json.loads(response.text)
         if len(j['site_hourly_production']['hourly_productions']) == 0:
             #no data for this days
