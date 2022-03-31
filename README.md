@@ -22,7 +22,8 @@ Vous trouverez des exemples de rendu ici:
 - https://www.electrons-solaires93.org/devenir-societaire/ (carte des sociétaires)
 
 Voici des exemples de graphiques pour les coopératives d'Ile de France avec le soutien d'[Energie Partagée](https://energie-partagee.org):
-- https://energie-partagee.ddns.net/IDF/
+- https://enercitif.org/cartographie/
+- https://www.plaine-energie-citoyenne.fr/epinay-en-chiffres/
 
 Le tableau de bord suivant présente des données des [Electrons Solaires](https://www.electrons-solaires93.org), de [EnerCit'IF](https://enercitif.org), de [Plaine Energie Citoyenne](https://www.plaine-energie-citoyenne.fr) et de [Sud Paris Soleil](https://sudparis-soleil.fr):
 - https://energie-partagee.ddns.net/dashboard/
