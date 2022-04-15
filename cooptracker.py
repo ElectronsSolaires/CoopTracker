@@ -83,7 +83,7 @@ if datetime.now().hour == 3 or update_all == True:
                                 name = 'Nombre de sociétaires', 
                                 zmin=0,
                                 zmax=df['Societaires'].max()*2,
-                                hovertemplate='%{z} sociétaires <extra></extra>'
+                                hovertemplate='<b>%{text}</b><br>%{z} sociétaires <extra></extra>',text = df['nom']
                             ))
 
     fig.update_layout(legend=dict(

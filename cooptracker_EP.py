@@ -115,7 +115,7 @@ def plot_map_societaires(geo_json, csv, df_sites, coopname, filename, lat_map, l
                                 name = 'Nombre de sociétaires', 
                                 zmin=0,
                                 zmax=df['Societaires'].max()*2,
-                                hovertemplate='%{z} sociétaires <extra></extra>'
+                                hovertemplate='<b>%{text}</b><br>%{z} sociétaires <extra></extra>',text = df['nom']
                             ))
 
     fig.update_layout(legend=dict(
