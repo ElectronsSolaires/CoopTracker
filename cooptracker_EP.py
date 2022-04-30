@@ -41,13 +41,22 @@ prod_file_path = "./Raw/"      #tell where production files are stored
 #########################################################################
 df=cfg.df_sites.sort_values(by='COOP', ascending=True)
 text = '<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea"><table><tr><td><b>Code</b></td><td><b>Cooperative</b></td><td><b>Site</b></td><td><b>Adresse</b></td><td><b>Installation</b></td><td><b>Puissance</b></td></tr>'
+tot_kwc = 0
 for row in range(0, len(df)): 
     text = text + '<tr><td>' +  df.iloc[row]['PREFIX'] + '</td><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td>' +  df.iloc[row]['PeakPW']  + ' kWc</td></tr>' 
-text = text + '</div><table></body></html>' 
+    tot_kwc = tot_kwc + float(df.iloc[row]['PeakPW'])
+text = text + '<tr><td><b>Total</b></td><td></td><td></td><td></td><td></td><td><b>' +  str(round(tot_kwc,1))  + ' kWc</b></td></tr>' 
+text = text + '</table></body></html>' 
 filename = "sites"    
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close()
+
+
+# In[ ]:
+
+
+
 
 
 # In[ ]:
