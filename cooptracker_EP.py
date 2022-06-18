@@ -649,7 +649,7 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1.write(text)
     file1.close() 
     
-def save_prod_sinceinstall_text(site, s, k, filename):
+def save_prod_sinceinstall_text(k, filename):
     text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><center><h4 style="color:#6CB041">' + str(round(k/1000000,1)) + ' MWh </h4></center></body></html>'
     file1 = open(file_path + filename + ".html","w", encoding='utf8')
     file1.write(text)
@@ -660,6 +660,7 @@ if datetime.now().hour == 4 or update_all == True:
     #Total production for each site
     fig_all_small = go.Figure()
     fig_all_large = go.Figure()
+    kwhtot=0
     for row in range(0, len(cfg.df_sites)):
         df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
         if cfg.df_sites.iloc[row]['PREFIX'] == "JZ":
@@ -678,8 +679,9 @@ if datetime.now().hour == 4 or update_all == True:
         kwh=round(df_prod['production_in_wh'].sum(),1)
         EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
-        save_prod_sinceinstall_text(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_sinceinstall_tex")
-
+        save_prod_sinceinstall_text(kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_sinceinstall_tex")
+        kwhtot = kwhtot + kwh
+        
         #filter dates (histogram over a 1 year window)
         a_year_ago = datetime.now() - timedelta(days=365)
         start_d = "{0}-{1:02}".format(a_year_ago.year-2000, a_year_ago.month)
@@ -746,7 +748,20 @@ if datetime.now().hour == 4 or update_all == True:
     df_grouped=df_prodAll.groupby('Date').sum().reset_index()
     df_prodAll = pd.DataFrame(df_grouped)
     fig=plot_hist_prod_month(df_prodAll, "Historique (tous les sites)", "Mois")  
-    utils.save_fig(fig, "All_data_all_sitesIDF_cumulated", file_path)
+    utils.save_fig(fig, "All_data_all_sitesIDF_cumulated", file_path) 
+    
+    #Cumulated prod per coop
+    for row in range(0, len(cfg.df_coops)):
+        df = cfg.df_sites[cfg.df_sites['COOP'] == cfg.df_coops.iloc[row]['COOP']]
+        for row_site in range(0, len(df)):
+            df_prod=datastorage.get_all_data(df.iloc[row_site]['PREFIX'], prod_file_path)
+            if row_site == 0:
+                df_prodAll = df_prod
+            else:
+                df_prodAll = df_prodAll.append(df_prod)
+        kwh = round(df_prodAll['production_in_wh'].sum(skipna = True),1)
+        save_prod_sinceinstall_text(kwh, cfg.df_coops.iloc[row]['COOPSNAME'] + "-prod_sinceinstall_tex")
+
 
 
 # In[ ]:
