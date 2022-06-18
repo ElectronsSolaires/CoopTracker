@@ -648,6 +648,12 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1 = open(file_path + filename + ".html","w", encoding='utf8')
     file1.write(text)
     file1.close() 
+    
+def save_prod_sinceinstall_text(site, s, k, filename):
+    text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><center><h4 style="color:#6CB041">' + str(round(k/1000000,1)) + ' MWh </h4></center></body></html>'
+    file1 = open(file_path + filename + ".html","w", encoding='utf8')
+    file1.write(text)
+    file1.close() 
 
 #Updated once a day at 4am (UTC)
 if datetime.now().hour == 4 or update_all == True:
@@ -672,6 +678,7 @@ if datetime.now().hour == 4 or update_all == True:
         kwh=round(df_prod['production_in_wh'].sum(),1)
         EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
+        save_prod_sinceinstall_text(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_sinceinstall_tex")
 
         #filter dates (histogram over a 1 year window)
         a_year_ago = datetime.now() - timedelta(days=365)
