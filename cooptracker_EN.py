@@ -49,7 +49,7 @@ for row in range(0, len(cfg.df_sites)):
 year=str(datetime.now().year)
 month=str(datetime.now().month)
 day=str(datetime.now().day) 
-d=year+'-'+month+'-'+day
+d = datetime.now().strftime("%Y-%m-%d")
 
 def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
