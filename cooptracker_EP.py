@@ -772,7 +772,7 @@ for row in range(0, len(df)):
     if row == 0:
         df_prodAllD = df_prod_allD
     else:
-        df_prodAllD = df_prodAll.append(df_prod_allD) 
+        df_prodAllD = df_prodAllD.append(df_prod_allD) 
         
     # prod yesterday
     thrity_days_ago = datetime.now() - timedelta(days=1)
@@ -781,7 +781,7 @@ for row in range(0, len(df)):
     if row == 0:
         df_prodYesterday = df_prod_yesterday
     else:
-        df_prodYesterday = df_prodAll.append(df_prod_yesterday) 
+        df_prodYesterday = df_prodYesterday.append(df_prod_yesterday) 
         
     # prod 30 days
     thrity_days_ago = datetime.now() - timedelta(days=30)
@@ -790,7 +790,7 @@ for row in range(0, len(df)):
     if row == 0:
         df_prod30 = df_prod_30
     else:
-        df_prod30 = df_prodAll.append(df_prod_30) 
+        df_prod30 = df_prod30.append(df_prod_30) 
         
     # prod today
     df_prod_today=epices.get_data_prod_day(df.iloc[row]['EPID'],d, df.iloc[row]['PREFIX'], cfg)
