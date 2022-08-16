@@ -36,26 +36,6 @@ prod_file_path = "./Raw/"      #tell where production files are stored
 # In[ ]:
 
 
-#########################################################################
-# Table with characteristics of all sites
-#########################################################################
-df=cfg.df_sites.sort_values(by='COOP', ascending=True)
-text = '<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea"><table><tr><td><b>Code</b></td><td><b>Cooperative</b></td><td><b>Site</b></td><td><b>Adresse</b></td><td><b>Installation</b></td><td><b>Puissance</b></td></tr>'
-tot_kwc = 0
-for row in range(0, len(df)): 
-    text = text + '<tr><td>' +  df.iloc[row]['PREFIX'] + '</td><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td>' +  df.iloc[row]['PeakPW']  + ' kWc</td></tr>' 
-    tot_kwc = tot_kwc + float(df.iloc[row]['PeakPW'])
-text = text + '<tr><td><b>Total</b></td><td></td><td></td><td></td><td></td><td><b>' +  str(round(tot_kwc,1))  + ' kWc</b></td></tr>' 
-text = text + '</table></body></html>' 
-filename = "sites"    
-file1 = open(file_path + filename + ".html","w", encoding='utf8')
-file1.write(text)
-file1.close()
-
-
-# In[ ]:
-
-
 
 
 
@@ -769,47 +749,81 @@ if datetime.now().hour == 4 or update_all == True:
 
 #########################################################################
 # Extra text for IDF dashboard
+# Table with characteristics of all sites
 #########################################################################
 
-#prod total
-for row in range(0, len(cfg.df_sites)):
-    df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
+df=cfg.df_sites.sort_values(by='COOP', ascending=True)
+text = '<html><head><link type="text/css" rel="Stylesheet" href="' + cfg.ESCSS + '" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea"><table><tr><td rowspan="2"><b>Code</b></td><td rowspan="2"><b>Cooperative</b></td><td rowspan="2"><b>Site</b></td><td rowspan="2"><b>Adresse</b></td><td rowspan="2"><b>Installation</b></td><td rowspan="2"><b>Puiss.</b><br>(kWc)</td><td colspan="5"><b>Prod. Journalière</b> (kWh)</td><td rowspan="2"><b>Prod.<br>Totale</b><br>(MWh)</td></tr><tr><td>J</td><td>J-1</td><td>Moy.<br> 30 J.</td><td>Max.<br>30 J.</td><td>Max.</td></tr>'
+tot_kwc = 0
+tot_today = 0
+tot_yesterday = 0
+tot_total = 0
+for row in range(0, len(df)):
+    #prod total
+    df_prod_all=datastorage.get_all_data(df.iloc[row]['PREFIX'], prod_file_path)
     if row == 0:
-        df_prodAll = df_prod
+        df_prodAll = df_prod_all
     else:
-        df_prodAll = df_prodAll.append(df_prod)
-prod_total = df_prodAll['production_in_wh'].sum(skipna = True)
-
-# prod yesterday
-thrity_days_ago = datetime.now() - timedelta(days=1)
-start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
-for row in range(0, len(cfg.df_sites)):
-    df_prod=datastorage.get_data_prod_hist_day(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'], prod_file_path, cfg)
+        df_prodAll = df_prodAll.append(df_prod_all)
+        
+    # prod since install
+    start_date = date(df.iloc[row]['DATEINST'].year, df.iloc[row]['DATEINST'].month, df.iloc[row]['DATEINST'].day)
+    df_prod_allD=datastorage.get_data_prod_hist_day(start_date, end_date, df.iloc[row]['EPID'], df.iloc[row]['PREFIX'], prod_file_path, cfg)
     if row == 0:
-        df_prodAll = df_prod
+        df_prodAllD = df_prod_allD
     else:
-        df_prodAll = df_prodAll.append(df_prod) 
-prod_yesterday = df_prodAll['production_in_wh'].sum(skipna = True)
-
-# prod 30 days
-thrity_days_ago = datetime.now() - timedelta(days=30)
-start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
-for row in range(0, len(cfg.df_sites)):
-    df_prod=datastorage.get_data_prod_hist_day(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'], prod_file_path, cfg)
+        df_prodAllD = df_prodAll.append(df_prod_allD) 
+        
+    # prod yesterday
+    thrity_days_ago = datetime.now() - timedelta(days=1)
+    start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
+    df_prod_yesterday=datastorage.get_data_prod_hist_day(start_date, end_date, df.iloc[row]['EPID'], df.iloc[row]['PREFIX'], prod_file_path, cfg)
     if row == 0:
-        df_prodAll = df_prod
+        df_prodYesterday = df_prod_yesterday
     else:
-        df_prodAll = df_prodAll.append(df_prod) 
-prod_month = df_prodAll['production_in_wh'].sum(skipna = True)
-
-# prod today
-for row in range(0, len(cfg.df_sites)):
-    df_prod=epices.get_data_prod_day(cfg.df_sites.iloc[row]['EPID'],d, cfg.df_sites.iloc[row]['PREFIX'], cfg)
+        df_prodYesterday = df_prodAll.append(df_prod_yesterday) 
+        
+    # prod 30 days
+    thrity_days_ago = datetime.now() - timedelta(days=30)
+    start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
+    df_prod_30=datastorage.get_data_prod_hist_day(start_date, end_date, df.iloc[row]['EPID'], df.iloc[row]['PREFIX'], prod_file_path, cfg)
     if row == 0:
-        df_prodAll=df_prod
+        df_prod30 = df_prod_30
     else:
-        df_prodAll = df_prodAll.append(df_prod) 
-prod_today = df_prodAll['production_in_wh'].sum(skipna = True)
+        df_prod30 = df_prodAll.append(df_prod_30) 
+        
+    # prod today
+    df_prod_today=epices.get_data_prod_day(df.iloc[row]['EPID'],d, df.iloc[row]['PREFIX'], cfg)
+    if row == 0:
+        df_prodToday=df_prod_today
+    else:
+        df_prodToday = df_prodToday.append(df_prod_today) 
+        
+    prod_today = df_prod_today['production_in_wh'].sum(skipna = True)
+    prod_yesterday = df_prod_yesterday['production_in_wh'].sum(skipna = True)
+    prod_avg_30 = df_prod_30['production_in_wh'].mean(skipna = True)
+    prod_max_30 = df_prod_30['production_in_wh'].max(skipna = True)
+    prod_max_all = df_prod_allD['production_in_wh'].max(skipna = True)
+    prod_total = df_prod_all['production_in_wh'].sum(skipna = True)
+    
+    text = text + '<tr><td>' +  df.iloc[row]['PREFIX'] + '</td><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td style="text-align:right">' +  str(round(float(df.iloc[row]['PeakPW']),1))  + '</td><td style="text-align:right">' + str(round(prod_today/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_yesterday/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_avg_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_all/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_total/1000000,1)) + '</td></tr>' 
+    tot_kwc = tot_kwc + float(df.iloc[row]['PeakPW'])
+    tot_today =  tot_today + prod_today
+    tot_yesterday =  tot_yesterday + prod_yesterday
+    tot_total = tot_total + prod_total
+    
+text = text + '<tr><td><b>Total</b></td><td></td><td></td><td></td><td></td><td style="text-align:right"><b>' +  str(round(tot_kwc,1)) + '</b></td><td style="text-align:right"><b>' +  str(round(tot_today/1000,1)) + '</b></td><td style="text-align:right"><b>' +  str(round(tot_yesterday/1000,1)) + '</b></td><td></td><td></td><td></td><td style="text-align:right"><b>' +  str(round(tot_total/1000000,1)) + '</b></td></tr>' 
+text = text + '</table></body></html>' 
+filename = "sites"    
+file1 = open(file_path + filename + ".html","w", encoding='utf8')
+file1.write(text)
+file1.close()
+    
+    
+prod_total_all = df_prodAll['production_in_wh'].sum(skipna = True)
+prod_yesterday = df_prodYesterday['production_in_wh'].sum(skipna = True)
+prod_month = df_prod30['production_in_wh'].sum(skipna = True)
+prod_today = df_prodToday['production_in_wh'].sum(skipna = True)
     
 filename = "Dashboard-prod-today-yesterday-month"
 text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">- ce jour : ' + str(round(prod_today/1000,1)) + ' KWh<br>- hier : ' + str(round(prod_yesterday/1000,1)) + ' KWh<br>- 30 derniers jours : ' + str(round(prod_month/1000000,1)) + ' MWh<br>- centrales en service : ' + str(len(cfg.df_sites)) + '</div></body></html>'
@@ -818,7 +832,7 @@ file1.write(text)
 file1.close() 
 
 filename = "Dashboard-prod-since-origin"
-text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><h3 style="color:#6CB041">Production cumulée de toutes les centrales : ' + str(round(prod_total/1000000,1)) + ' MWh<span>&#42;</span></h3></body></html>'
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><h3 style="color:#6CB041">Production cumulée de toutes les centrales : ' + str(round(prod_total_all/1000000,1)) + ' MWh<span>&#42;</span></h3></body></html>'
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close() 
