@@ -61,6 +61,11 @@ df_sites = df_sites.append({'COOP':"EnerCit'IF", 'COOPSITE':'https://enercitif.o
 df_sites = df_sites.append({'COOP':"EnerCit'IF", 'COOPSITE':'https://enercitif.org','EPID': '5635', 'PREFIX':'T0101', 'SNAME': 'Panoyaux', 'LNAME': "HLM Panoyaux", 'TYPE': "HLM", 'DATEINST': datetime(2022, 4, 19, 0,0,0), 'CITY':'Paris, 75020', 'LAT':'48.87','LON':'2.39', 'PeakPW':'9.0'}, ignore_index=True)
 df_sites = df_sites.append({'COOP':"EnerCit'IF", 'COOPSITE':'https://enercitif.org','EPID': '6202', 'PREFIX':'T0107', 'SNAME': 'Partants', 'LNAME': "HLM Partants", 'TYPE': "HLM", 'DATEINST': datetime(2022, 11, 5, 0,0,0), 'CITY':'Paris, 75020', 'LAT':'48.87','LON':'2.4', 'PeakPW':'36.0'}, ignore_index=True)
 
+# ENERGIE PARTAGEE INVESTISSEMENT
+df_sites = df_sites.append({'COOP':"Energie Partagee", 'COOPSITE':'https://energie-partagee.org/','EPID': '509', 'PREFIX':'BM', 'SNAME': 'Mantois', 'LNAME': "Biocoop Du Mantois", 'TYPE': "Entreprise", 'DATEINST': datetime(2011, 5, 5, 0,0,0), 'CITY':'Épône, 78680', 'LAT':'48.96040344','LON':'1.81361103', 'PeakPW':'60.0'}, ignore_index=True)
+df_sites = df_sites.append({'COOP':"Energie Partagee", 'COOPSITE':'https://energie-partagee.org/','EPID': '856', 'PREFIX':'HP', 'SNAME': 'Pajol', 'LNAME': "Halle Pajol", 'TYPE': "ZAC", 'DATEINST': datetime(2013, 3, 26, 0,0,0), 'CITY':'Paris, 75018', 'LAT':'48.888352','LON':'2.362944', 'PeakPW':'465.1'}, ignore_index=True)
+df_sites = df_sites.append({'COOP':"Energie Partagee", 'COOPSITE':'https://energie-partagee.org/','EPID': '857', 'PREFIX':'QT', 'SNAME': 'Quintessence', 'LNAME': "Copro Quintessence", 'TYPE': "Copro", 'DATEINST': datetime(2012, 9, 18, 0,0,0), 'CITY':'Paris, 75017', 'LAT':'48.890868','LON':'2.316446', 'PeakPW':'95.6'}, ignore_index=True)
+
 # PLAINE ÉNERGIE CITOYENNE
 df_sites = df_sites.append({'COOP':"Plaine Energie Citoyenne", 'COOPSITE':'https://www.plaine-energie-citoyenne.fr','EPID': '4218', 'PREFIX':'PCE01', 'SNAME': 'Jean Jaurès', 'LNAME': 'Ecole Jean Jaurès', 'TYPE':'Ecole élémentaire', 'DATEINST': datetime(2021, 9, 21, 0,0,0), 'CITY':'Épinay sur Seine', 'LAT':'48.9549477430581','LON':'2.32497286901782', 'PeakPW':'78.5'}, ignore_index=True)
 # Sud Paris Soleil
