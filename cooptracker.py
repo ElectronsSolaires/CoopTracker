@@ -563,6 +563,7 @@ def plot_hist_prod_month_all(df_prodWR, df_prodJZ):
     fig.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)",x=0, y=1))
     fig.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig.update_xaxes(title_text='')
+    fig.update_xaxes(barmode='stack',bargap=0.1)
     fig.update_xaxes(dtick="M1", tickformat="%b\n%Y")
     fig.update_yaxes(title_text="<b>Production (MWh)</b>", color="rgb(136, 136, 136)")
     fig.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
@@ -609,6 +610,19 @@ if datetime.now().hour == 4 or update_all == True:
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
         #save_prod_hist_text_all(-1, EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
 
+    #filter dates (histogram over a 2 years window)
+    two_years_ago = datetime.now() - timedelta(days=365*2)
+    start_d = "{0}-{1:02}".format(two_years_ago.year-2000, two_years_ago.month)
+    end_d = "{0}-{1:02}".format(datetime.now().year-2000, datetime.now().month)        
+    after_start_date = df_prodWR['Date'] > start_d
+    before_end_date = df_prodWR['Date'] <= end_d
+    between_two_dates = after_start_date & before_end_date
+    df_prodWR = df_prodWR.loc[between_two_dates]        
+    after_start_date = df_prodJZ['Date'] > start_d
+    before_end_date = df_prodJZ['Date'] <= end_d
+    between_two_dates = after_start_date & before_end_date
+    df_prodJZ = df_prodJZ.loc[between_two_dates]
+    
     #All sites
     fig=plot_hist_prod_month_all(df_prodWR,df_prodJZ)
     utils.save_fig(fig,"All_data_all_sites", file_path)
