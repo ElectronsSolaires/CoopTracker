@@ -11,8 +11,12 @@ def get_data_prod_day(site, d, prefix, cfg):
         raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
     j = json.loads(response.text)
     df_prod = pd.DataFrame(j['site_hourly_production']['hourly_productions'])
-    df_prod['utc_timestamps_Paris'] = pd.to_datetime(df_prod['utc_timestamps'])
-    df_prod['utc_timestamps_Paris']=df_prod['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
+    if len(df_prod) == 0:
+        #no data for this days
+        print("no data for day:" + str(d) + " site: " + site)
+    else:
+        df_prod['utc_timestamps_Paris'] = pd.to_datetime(df_prod['utc_timestamps'])
+        df_prod['utc_timestamps_Paris']=df_prod['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
     return df_prod
 
 #Retreive and archive all data
