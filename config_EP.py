@@ -70,6 +70,8 @@ df_sites = df_sites.append({'COOP':"Energie Partagee", 'COOPSITE':'https://energ
 
 # PLAINE ÉNERGIE CITOYENNE
 df_sites = df_sites.append({'COOP':"Plaine Energie Citoyenne", 'COOPSITE':'https://www.plaine-energie-citoyenne.fr','EPID': '4218', 'PREFIX':'PCE01', 'SNAME': 'Jean Jaurès', 'LNAME': 'Ecole Jean Jaurès', 'TYPE':'Ecole élémentaire', 'DATEINST': datetime(2021, 9, 21, 0,0,0), 'CITY':'Épinay sur Seine', 'LAT':'48.9549477430581','LON':'2.32497286901782', 'PeakPW':'78.5'}, ignore_index=True)
+df_sites = df_sites.append({'COOP':"Plaine Energie Citoyenne", 'COOPSITE':'https://www.plaine-energie-citoyenne.fr','EPID': '12432', 'PREFIX':'PCE02', 'SNAME': 'Jean de la Fontaine', 'LNAME': 'Ecole Jean de la Fontaine', 'TYPE':'Ecole maternelle et élémentaire', 'DATEINST': datetime(2024, 9, 5, 0,0,0), 'CITY':'Saint-Ouen', 'LAT':'48.91','LON':'2.33', 'PeakPW':'110.6'}, ignore_index=True)
+
 # Sud Paris Soleil
 df_sites = df_sites.append({'COOP':"Sud Paris Soleil", 'COOPSITE':'https://sudparis-soleil.fr','EPID': '4011', 'PREFIX':'SPS01', 'SNAME': 'La Plaine', 'LNAME': 'Ecole La Plaine', 'TYPE':'Ecole élémentaire', 'DATEINST': datetime(2021, 4, 21, 0,0,0), 'CITY':'Cachan', 'LAT':'48.786118','LON':'2.333903', 'PeakPW':'99.8'}, ignore_index=True)
 
