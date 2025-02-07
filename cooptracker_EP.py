@@ -794,11 +794,13 @@ for row in range(0, len(df)):
         
     # prod today
     df_prod_today=epices.get_data_prod_day(df.iloc[row]['EPID'],d, df.iloc[row]['PREFIX'], cfg)
-    if row == 0:
-        df_prodToday=df_prod_today
+    if len(df_prod_today)>0:
+        if row == 0:
+            df_prodToday=df_prod_today
+        else:
+            df_prodToday = df_prodToday.append(df_prod_today) 
     else:
-        df_prodToday = df_prodToday.append(df_prod_today) 
-        
+        df_prod_today['production_in_wh'] = 0    
     prod_today = df_prod_today['production_in_wh'].sum(skipna = True)
     prod_yesterday = df_prod_yesterday['production_in_wh'].sum(skipna = True)
     prod_avg_30 = df_prod_30['production_in_wh'].mean(skipna = True)
