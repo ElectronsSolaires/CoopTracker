@@ -640,6 +640,7 @@ if datetime.now().hour == 4 or update_all == True:
     #Total production for each site
     fig_all_small = go.Figure()
     fig_all_large = go.Figure()
+    fig_all_xlarge = go.Figure()
     kwhtot=0
     for row in range(0, len(cfg.df_sites)):
         df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
@@ -671,9 +672,21 @@ if datetime.now().hour == 4 or update_all == True:
         between_two_dates = after_start_date & before_end_date
         df_prod = df_prod.loc[between_two_dates]
 
-        
         if float(cfg.df_sites.iloc[row]['PeakPW']) < 40 :
             fig_all_small.add_trace(
+                go.Bar(
+                    x=df_prod['Date'],
+                    y=df_prod['production_in_wh']/1000000,
+                    name=cfg.df_sites.iloc[row]['PREFIX'],
+                    #marker_color='rgb(108, 176, 65)',
+                    textposition='none',
+                    hovertemplate =
+                    '<b>Date</b>: %{x}'+
+                    '<br><b>Production</b>: %{y:.1f} MWh<br><extra></extra>'
+                )
+            )
+        elif float(cfg.df_sites.iloc[row]['PeakPW']) >= 40 and float(cfg.df_sites.iloc[row]['PeakPW'])< 400:
+            fig_all_large.add_trace(
                 go.Bar(
                     x=df_prod['Date'],
                     y=df_prod['production_in_wh']/1000000,
@@ -705,6 +718,8 @@ if datetime.now().hour == 4 or update_all == True:
     fig_all_small.update_yaxes(showgrid=False)
     fig_all_large.update_xaxes(showgrid=False)
     fig_all_large.update_yaxes(showgrid=False)
+    fig_all_xlarge.update_xaxes(showgrid=False)
+    fig_all_xlarge.update_yaxes(showgrid=False)
     
     #All small sites (histograms side by side)
     fig_all_small.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)", x=0, y=1))
@@ -723,6 +738,15 @@ if datetime.now().hour == 4 or update_all == True:
     fig_all_large.update_yaxes(title_text="<b>Production (MWh)</b>", color="rgb(136, 136, 136)")
     fig_all_large.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     utils.save_fig(fig_all_large,"All_data_all_large_sitesIDF", file_path)
+
+    #All xlarge_small sites (histograms side by side)
+    fig_all_xlarge.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)", x=0, y=1))
+    fig_all_xlarge.update_layout(margin=dict(l=0,r=0,b=0,t=0))
+    fig_all_xlarge.update_xaxes(title_text='')
+    fig_all_xlarge.update_xaxes(dtick="M1", tickformat="%b\n%Y")
+    fig_all_xlarge.update_yaxes(title_text="<b>Production (MWh)</b>", color="rgb(136, 136, 136)")
+    fig_all_xlarge.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
+    utils.save_fig(fig_all_xlarge,"All_data_all_xlarge_sitesIDF", file_path)
     
     #All sites (cumulated)
     df_grouped=df_prodAll.groupby('Date').sum().reset_index()
