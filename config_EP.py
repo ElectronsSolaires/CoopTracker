@@ -34,6 +34,7 @@ df_coops = df_coops.append({'COOP':'Electrons Solaires', 'COOPSNAME':'ES', 'COOP
 df_coops = df_coops.append({'COOP':"EnerCit'IF", 'COOPSNAME':'EN', 'COOPSITE':'https://enercitif.org', 'LAT':'48.856800698876825','LON':'2.339480252881264', 'GEOJSON':'arrondissements.geojson', 'CSV_Societaries':'http://jeremie.leguay.free.fr/ES/societairesEN.csv'}, ignore_index=True)
 df_coops = df_coops.append({'COOP':"Plaine Energie Citoyenne", 'COOPSNAME':'PEC', 'COOPSITE':'https://www.plaine-energie-citoyenne.fr', 'LAT':'48.927904500740645','LON':'2.3432568031675585', 'GEOJSON':'93.geojson', 'CSV_Societaries':'http://jeremie.leguay.free.fr/ES/societairesPEC.csv'}, ignore_index=True)
 df_coops = df_coops.append({'COOP':"Sud Paris Soleil", 'COOPSNAME':'SPS', 'COOPSITE':'https://sudparis-soleil.fr', 'LAT':'48.78559575575932','LON':'2.324374052123191', 'GEOJSON':'94.geojson', 'CSV_Societaries':'http://jeremie.leguay.free.fr/ES/societairesSPS.csv'}, ignore_index=True)
+df_coops = df_coops.append({'COOP':"Fermes Solaires du Mont-Valérien", 'COOPSNAME':'FSMV', 'COOPSITE':'https://www.fsmv.fr', 'LAT':'48.871996','LON':'2.217744', 'GEOJSON':'92.geojson', 'CSV_Societaries':'http://jeremie.leguay.free.fr/ES/societairesSPS.csv'}, ignore_index=True)
 
 
 ###########################
@@ -74,4 +75,7 @@ df_sites = df_sites.append({'COOP':"Plaine Energie Citoyenne", 'COOPSITE':'https
 
 # Sud Paris Soleil
 df_sites = df_sites.append({'COOP':"Sud Paris Soleil", 'COOPSITE':'https://sudparis-soleil.fr','EPID': '4011', 'PREFIX':'SPS01', 'SNAME': 'La Plaine', 'LNAME': 'Ecole La Plaine', 'TYPE':'Ecole élémentaire', 'DATEINST': datetime(2021, 4, 21, 0,0,0), 'CITY':'Cachan', 'LAT':'48.786118','LON':'2.333903', 'PeakPW':'99.8'}, ignore_index=True)
+
+#FSMV
+df_sites = df_sites.append({'COOP':"Fermes Solaires du Mont-Valérien", 'COOPSITE':'https://www.fsmv.fr','EPID': '9999', 'PREFIX':'FSMV', 'SNAME': 'FSMV', 'LNAME': 'Mont-Valérien', 'TYPE':'Fermes Solaires', 'DATEINST': datetime(2023, 8, 1, 0,0,0), 'CITY':'Suresnes', 'LAT':'48.871996','LON':'2.217744', 'PeakPW':'25.5'}, ignore_index=True)
 
