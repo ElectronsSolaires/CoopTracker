@@ -831,7 +831,18 @@ for row in range(0, len(df)):
     prod_max_30 = df_prod_30['production_in_wh'].max(skipna = True)
     prod_max_all = df_prod_allD['production_in_wh'].max(skipna = True)
     prod_total = df_prod_all['production_in_wh'].sum(skipna = True)
-    
+
+    #special case for FSMV
+    PeakPW = df.iloc[row]['PeakPW']
+    if df.iloc[row]['EPID'] == str(9999):
+        yesterday = datetime.now() - timedelta(days=1)
+        d = yesterday.strftime("%Y-%m-%d")
+        PeakPW = 25.5
+        response = requests.get('https://tools.fsmv.fr/graph/fsmv_api.php?energy_type=prod&date='+d)
+        if response.status_code == 200 and str(response.text).find('No Record Found') == -1:
+            j = json.loads(response.text)
+            PeakPW = j['site']['power']['value']
+            
     text = text + '<tr><td>' +  df.iloc[row]['PREFIX'] + '</td><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td style="text-align:right">' +  str(round(float(df.iloc[row]['PeakPW']),1))  + '</td><td style="text-align:right">' + str(round(prod_today/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_yesterday/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_avg_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_all/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_total/1000000,1)) + '</td></tr>' 
     tot_kwc = tot_kwc + float(df.iloc[row]['PeakPW'])
     tot_today =  tot_today + prod_today
