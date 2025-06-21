@@ -855,6 +855,13 @@ filename = "sites"
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close()
+
+#iframe for ES home page
+text="<html><head><link type='text/css' rel='Stylesheet' href='" + cfg.ESCSS + "' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body style='background-color:white;'><div class='textarea'><p style='text-align: center;'>Production depuis le début<br>(et &gt; <a href='https://www.electrons-solaires93.org/tableau-de-bord-idf/' target='_blank' rel='noopener'><strong>" + str(round(tot_total/1000000))  + " MWh</strong> en IDF</a> !)</p></div></body></html>"
+filename = "prod_tot_IDF_text"
+file1 = open(file_path + filename + ".html","w", encoding='utf8')
+file1.write(text)
+file1.close()
     
     
 prod_total_all = df_prodAll['production_in_wh'].sum(skipna = True)
