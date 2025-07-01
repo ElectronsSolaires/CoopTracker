@@ -876,7 +876,7 @@ file1.write(text)
 file1.close() 
 
 filename = "Dashboard-prod-since-origin"
-text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><h3 style="color:#6CB041">Production cumulée de toutes les centrales : ' + str(round(prod_total_all/1000000,1)) + ' MWh<span>&#42;</span></h3></body></html>'
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><h3 style="color:#6CB041">Production cumulée de toutes les centrales : ' + str(round(tot_total/1000000,1)) + ' MWh<span>&#42;</span></h3></body></html>'
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close() 
