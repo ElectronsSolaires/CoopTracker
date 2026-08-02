@@ -12,6 +12,9 @@
 # Contacts: Jeremie L., Jean-Marie B. (Électrons solaires, webmestre@electrons-solaires93.org)
 # License: CC-BY-SA 4.0
 ##########################################################################################
+import warnings
+
+warnings.simplefilter("ignore", FutureWarning)
 
 import plotly
 import plotly.graph_objects as go
@@ -28,15 +31,9 @@ import json
 import time
 
 import config_EP as cfg        #file containing API keys / credentials / configuration
-update_all = True              #update all plots (independently of scheduled updates)
-file_path = "./../"            #tell where local files are stored 
+update_all = False             #update all plots (independently of scheduled updates)
+file_path = "./www/"            #tell where local files are stored 
 prod_file_path = "./Raw/"      #tell where production files are stored 
-
-
-# In[ ]:
-
-
-
 
 
 # In[ ]:
@@ -49,10 +46,8 @@ prod_file_path = "./Raw/"      #tell where production files are stored
 ##################################################################################
 
 def save_map(fig, filename):
-    #Save map as png and html
-    fig.write_image(file_path + filename + ".png")
-    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='https://cdn.plot.ly/plotly-mapbox-2.11.1.min.js')
-    fig.show()
+    #Save map as html only; skip PNG export to avoid Kaleido hangs.
+    plotly.offline.plot(fig, filename=file_path + filename + ".html", auto_open=False, include_plotlyjs='https://cdn.plot.ly/plotly-mapbox-2.11.1.min.js')
         
     #Upload on NextCloud
     if cfg.NEXTCLOUD == True:
@@ -176,10 +171,10 @@ def plot_map_cooperatives(geo_json, csv, df_sites, filename, lat_map, lon_map):
     save_map(fig, filename)
 
 #Updated once a day at 3am (UTC)
-if datetime.now().hour == 3 or update_all == True: 
+if datetime.now().hour == 2 or update_all == True: 
     # Map per cooperative (IDF)
-    plot_map_cooperatives(cfg.GEOJSON_DATA_IDF, cfg.CSV_COOPS, cfg.df_sites, 'map_IDF', 48.8845927777778, 2.38651155555556) 
-    
+    plot_map_cooperatives(cfg.GEOJSON_DATA_IDF, cfg.CSV_COOPS, cfg.df_sites, 'map_IDF', 48.882252, 2.310389) 
+    #plot_map_cooperatives(cfg.GEOJSON_DATA_IDF, cfg.CSV_COOPS, cfg.df_sites, 'map_IDF', 48.8845927777778, 2.38651155555556) 
     # Map per cooperative 
     for row in range(0, len(cfg.df_coops)):
         df = cfg.df_sites[cfg.df_sites['COOP'] == cfg.df_coops.iloc[row]['COOP']]
@@ -202,9 +197,10 @@ d = datetime.now().strftime("%Y-%m-%d")
 def plot_hist_prod(df_prod, titlename, col_time, col_time_text):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Line(
+        go.Scatter(
             x=df_prod[col_time],
             y=df_prod['gh_wm2'],
+            mode='lines',
             name="prévision ensoleillement (W/m2)",
             line=dict(color='rgb(37, 64, 143)'),
             hovertemplate =
@@ -339,16 +335,22 @@ def prod_hist(start_date, end_date, days):
         
 #Retreive and archive all data
 def retreive_all_data(end_date):
-    for row in range(len(cfg.df_sites)-2, len(cfg.df_sites)-1):        
+    #for row in range(0, len(cfg.df_sites)):
+    print(len(cfg.df_sites))
+    for row in range(len(cfg.df_sites)-1, len(cfg.df_sites)):
+        print(cfg.df_sites.iloc[row]['EPID'])
         start_date = date(cfg.df_sites.iloc[row]['DATEINST'].year, cfg.df_sites.iloc[row]['DATEINST'].month,cfg.df_sites.iloc[row]['DATEINST'].day)
         df_prod=epices.get_data_prod_hist(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'], cfg.NEXTCLOUD, prod_file_path,cfg)
 
-#updated once a day at 2am
-if datetime.now().hour == 2 or update_all == True:
+#updated once a day at 3am
+if datetime.now().hour == 3 or update_all == True:
+    #retreive_all_data(end_date)
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
     prod_hist(start_date, end_date, 3)
-    #retreive_all_data(end_date)
+
+
+
 
 
 # In[ ]:
@@ -363,9 +365,10 @@ if datetime.now().hour == 2 or update_all == True:
 def plot_hist_prod_day(df_prod, titlename, col_time, col_time_text):
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Line(
+        go.Scatter(
             x=df_prod[col_time],
             y=df_prod['unhabitants_equivalents'],
+            mode='lines',
             name="equivalent (habitants)",
             line=dict(color='rgb(37, 64, 143)'),
             hovertemplate =
@@ -410,7 +413,7 @@ def save_prod_hist_text(site, s, k, d, filename):
 def plot_hist_prod_unhabitants():
     df = pd.DataFrame(columns=['site','unhabitants_equivalents'])
     for row in range(0, len(cfg.df_sites)):
-        df = df.append({'site': cfg.df_sites.iloc[row]['TYPE'] + '<br>' + cfg.df_sites.iloc[row]['SNAME'] + ' <br>(' + cfg.df_sites.iloc[row]['CITY'] + ')', 'unhabitants_equivalents': cfg.df_sites.iloc[row]['EH']}, ignore_index=True) 
+        df = pd.concat([df, pd.DataFrame([{'site': cfg.df_sites.iloc[row]['TYPE'] + '<br>' + cfg.df_sites.iloc[row]['SNAME'] + ' <br>(' + cfg.df_sites.iloc[row]['CITY'] + ')', 'unhabitants_equivalents': cfg.df_sites.iloc[row]['EH']}])], ignore_index=True) 
     fig = go.Figure()
     fig.add_trace(
         go.Bar(
@@ -431,7 +434,10 @@ def plot_hist_prod_unhabitants():
 def prod_hist_day(start_date, end_date, days):
     col_time = 'Date'
     col_time_text = 'Jours'
-    cfg.df_sites['EH'] = 0
+    if 'EH' not in cfg.df_sites.columns:
+        cfg.df_sites['EH'] = 0.0
+    else:
+        cfg.df_sites['EH'] = cfg.df_sites['EH'].astype(float)
     meanAll = 0
     kwhAll = 0
     #Production of each site
@@ -486,9 +492,10 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
     #relevant data: uvi, cloudiness & rain, temp
     fig = make_subplots(specs=[[{"secondary_y": True}]])
     fig.add_trace(
-        go.Line(
+        go.Scatter(
             x=df_prodGHI['utc_timestamps_Paris'],
             y=df_prodGHI['gh_wm2'],
+            mode='lines',
             name="ensoleilement (W/m2)",
             line=dict(color='rgb(37, 64, 143)'),
             hovertemplate =
@@ -496,9 +503,10 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
             '<br><b>Ensoleilement</b>: %{y:.1f} W/m2<br><extra></extra>'
         ),secondary_y=True)# row=1, col=1)
     fig.add_trace(
-        go.Line(
+        go.Scatter(
             x=df_prod['Date'],
             y=df_prod['clouds'],
+            mode='lines',
             name="nébulosité (%)",
             line=dict(color='red'),
             hovertemplate =
@@ -524,20 +532,18 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
     return fig
 
 #Updated once a day at 3am (UTC)
-if datetime.now().hour == 3 or update_all == True:
-    past_days_ago = datetime.now() - timedelta(days=3)
-    start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
-    # Weather for each site
-    for row in range(0, len(cfg.df_sites)):
-        df_prod = weather.get_data_weather_hist(start_date, end_date, row, cfg)
-        df_prodGHI=epices.get_data_prod_hist(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'], False, prod_file_path, cfg)
-        df_prod['Date'] = pd.to_datetime(df_prod['dt'],unit='s', utc=True)
-        df_prod['Date']=df_prod['Date'].dt.tz_convert('Europe/Paris')
-        df_prod = df_prod.iloc[6:len(df_prod.index)-3] #remove first 6 and last 2 data points
-        fig=plot_weather_hist(df_prod, df_prodGHI, "Historique meteo (" + cfg.df_sites.iloc[row]['SNAME'] +", " + cfg.df_sites.iloc[row]['CITY'] + ")")
-        utils.save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + '_weather_hist', file_path)
-
-
+#if datetime.now().hour == 3 or update_all == True:
+#    past_days_ago = datetime.now() - timedelta(days=3)
+#    start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
+#    # Weather for each site
+#    for row in range(0, len(cfg.df_sites)):
+#            df_prod = weather.get_data_weather_hist(start_date, end_date, row, cfg)
+#            df_prodGHI=epices.get_data_prod_hist(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'], False, prod_file_path, cfg)
+#            df_prod['Date'] = pd.to_datetime(df_prod['dt'],unit='s', utc=True)
+#            df_prod['Date']=df_prod['Date'].dt.tz_convert('Europe/Paris')
+#            df_prod = df_prod.iloc[6:len(df_prod.index)-3] #remove first 6 and last 2 data points
+#            fig=plot_weather_hist(df_prod, df_prodGHI, "Historique meteo (" + cfg.df_sites.iloc[row]['SNAME'] +", " + cfg.df_sites.iloc[row]['CITY'] + ")")
+#            utils.save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + '_weather_hist', file_path)
 # 
 
 # In[ ]:
@@ -628,7 +634,7 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1 = open(file_path + filename + ".html","w", encoding='utf8')
     file1.write(text)
     file1.close() 
-    
+
 def save_prod_sinceinstall_text(k, filename):
     text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><center><h4 style="color:#6CB041">' + str(round(k/1000000,1)) + ' MWh </h4></center></body></html>'
     file1 = open(file_path + filename + ".html","w", encoding='utf8')
@@ -641,7 +647,6 @@ if datetime.now().hour == 4 or update_all == True:
     fig_all_small = go.Figure()
     fig_all_large = go.Figure()
     fig_all_xlarge = go.Figure()
-    kwhtot=0
     for row in range(0, len(cfg.df_sites)):
         df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
         if cfg.df_sites.iloc[row]['PREFIX'] == "JZ":
@@ -661,8 +666,7 @@ if datetime.now().hour == 4 or update_all == True:
         EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * days)     #inhabitant equivalent (1465 kWH / habitant / year)
         save_prod_hist_text_all(cfg.df_sites.iloc[row]['EPID'], EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
         save_prod_sinceinstall_text(kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_sinceinstall_tex")
-        kwhtot = kwhtot + kwh
-        
+
         #filter dates (histogram over a 1 year window)
         a_year_ago = datetime.now() - timedelta(days=365)
         start_d = "{0}-{1:02}".format(a_year_ago.year-2000, a_year_ago.month)
@@ -672,6 +676,7 @@ if datetime.now().hour == 4 or update_all == True:
         between_two_dates = after_start_date & before_end_date
         df_prod = df_prod.loc[between_two_dates]
 
+        
         if float(cfg.df_sites.iloc[row]['PeakPW']) < 40 :
             fig_all_small.add_trace(
                 go.Bar(
@@ -699,7 +704,7 @@ if datetime.now().hour == 4 or update_all == True:
                 )
             )
         else:
-            fig_all_large.add_trace(
+            fig_all_xlarge.add_trace(
                 go.Bar(
                     x=df_prod['Date'],
                     y=df_prod['production_in_wh']/1000000,
@@ -713,12 +718,12 @@ if datetime.now().hour == 4 or update_all == True:
         if row == 0:
             df_prodAll = df_prod
         else:
-            df_prodAll = df_prodAll.append(df_prod)
+            df_prodAll = pd.concat([df_prodAll, df_prod], ignore_index=True)
     fig_all_small.update_xaxes(showgrid=False)
     fig_all_small.update_yaxes(showgrid=False)
     fig_all_large.update_xaxes(showgrid=False)
     fig_all_large.update_yaxes(showgrid=False)
-    fig_all_xlarge.update_xaxes(showgrid=False)
+    fig_all_xlarge.update_yaxes(showgrid=False)
     fig_all_xlarge.update_yaxes(showgrid=False)
     
     #All small sites (histograms side by side)
@@ -739,7 +744,7 @@ if datetime.now().hour == 4 or update_all == True:
     fig_all_large.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     utils.save_fig(fig_all_large,"All_data_all_large_sitesIDF", file_path)
 
-    #All xlarge_small sites (histograms side by side)
+    #All large_small sites (histograms side by side)
     fig_all_xlarge.update_layout(legend=dict(orientation="h", yanchor="bottom", bgcolor="rgba(0,0,0,0)", x=0, y=1))
     fig_all_xlarge.update_layout(margin=dict(l=0,r=0,b=0,t=0))
     fig_all_xlarge.update_xaxes(title_text='')
@@ -747,13 +752,14 @@ if datetime.now().hour == 4 or update_all == True:
     fig_all_xlarge.update_yaxes(title_text="<b>Production (MWh)</b>", color="rgb(136, 136, 136)")
     fig_all_xlarge.update_layout(font=dict(family="Roboto, sans-serif", size=12, color="rgb(136, 136, 136)"))
     utils.save_fig(fig_all_xlarge,"All_data_all_xlarge_sitesIDF", file_path)
-    
+
     #All sites (cumulated)
     df_grouped=df_prodAll.groupby('Date').sum().reset_index()
     df_prodAll = pd.DataFrame(df_grouped)
     fig=plot_hist_prod_month(df_prodAll, "Historique (tous les sites)", "Mois")  
-    utils.save_fig(fig, "All_data_all_sitesIDF_cumulated", file_path) 
-    
+    utils.save_fig(fig, "All_data_all_sitesIDF_cumulated", file_path)
+
+
     #Cumulated prod per coop
     for row in range(0, len(cfg.df_coops)):
         df = cfg.df_sites[cfg.df_sites['COOP'] == cfg.df_coops.iloc[row]['COOP']]
@@ -762,11 +768,9 @@ if datetime.now().hour == 4 or update_all == True:
             if row_site == 0:
                 df_prodAll = df_prod
             else:
-                df_prodAll = df_prodAll.append(df_prod)
+                df_prodAll = pd.concat([df_prodAll, df_prod], ignore_index=True)
         kwh = round(df_prodAll['production_in_wh'].sum(skipna = True),1)
         save_prod_sinceinstall_text(kwh, cfg.df_coops.iloc[row]['COOPSNAME'] + "-prod_sinceinstall_tex")
-
-
 
 # In[ ]:
 
@@ -788,7 +792,7 @@ for row in range(0, len(df)):
     if row == 0:
         df_prodAll = df_prod_all
     else:
-        df_prodAll = df_prodAll.append(df_prod_all)
+        df_prodAll = pd.concat([df_prodAll, df_prod_all], ignore_index=True)
         
     # prod since install
     start_date = date(df.iloc[row]['DATEINST'].year, df.iloc[row]['DATEINST'].month, df.iloc[row]['DATEINST'].day)
@@ -796,7 +800,7 @@ for row in range(0, len(df)):
     if row == 0:
         df_prodAllD = df_prod_allD
     else:
-        df_prodAllD = df_prodAllD.append(df_prod_allD) 
+        df_prodAllD = pd.concat([df_prodAllD, df_prod_allD], ignore_index=True) 
         
     # prod yesterday
     thrity_days_ago = datetime.now() - timedelta(days=1)
@@ -805,7 +809,7 @@ for row in range(0, len(df)):
     if row == 0:
         df_prodYesterday = df_prod_yesterday
     else:
-        df_prodYesterday = df_prodYesterday.append(df_prod_yesterday) 
+        df_prodYesterday = pd.concat([df_prodYesterday, df_prod_yesterday], ignore_index=True) 
         
     # prod 30 days
     thrity_days_ago = datetime.now() - timedelta(days=30)
@@ -814,24 +818,25 @@ for row in range(0, len(df)):
     if row == 0:
         df_prod30 = df_prod_30
     else:
-        df_prod30 = df_prod30.append(df_prod_30) 
+        df_prod30 = pd.concat([df_prod30, df_prod_30], ignore_index=True) 
         
     # prod today
+    print(df.iloc[row]['EPID'])
     df_prod_today=epices.get_data_prod_day(df.iloc[row]['EPID'],d, df.iloc[row]['PREFIX'], cfg)
     if len(df_prod_today)>0:
         if row == 0:
             df_prodToday=df_prod_today
         else:
-            df_prodToday = df_prodToday.append(df_prod_today) 
+            df_prodToday = pd.concat([df_prodToday, df_prod_today], ignore_index=True) 
     else:
-        df_prod_today['production_in_wh'] = 0    
+        df_prod_today['production_in_wh'] = 0
     prod_today = df_prod_today['production_in_wh'].sum(skipna = True)
     prod_yesterday = df_prod_yesterday['production_in_wh'].sum(skipna = True)
     prod_avg_30 = df_prod_30['production_in_wh'].mean(skipna = True)
     prod_max_30 = df_prod_30['production_in_wh'].max(skipna = True)
     prod_max_all = df_prod_allD['production_in_wh'].max(skipna = True)
     prod_total = df_prod_all['production_in_wh'].sum(skipna = True)
-
+    
     #special case for FSMV
     PeakPW = df.iloc[row]['PeakPW']
     if df.iloc[row]['EPID'] == str(9999):
@@ -842,8 +847,8 @@ for row in range(0, len(df)):
         if response.status_code == 200 and str(response.text).find('No Record Found') == -1:
             j = json.loads(response.text)
             PeakPW = j['site']['power']['value']
-            
-    text = text + '<tr><td>' +  df.iloc[row]['PREFIX'] + '</td><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td style="text-align:right">' +  str(round(float(df.iloc[row]['PeakPW']),1))  + '</td><td style="text-align:right">' + str(round(prod_today/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_yesterday/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_avg_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_all/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_total/1000000,1)) + '</td></tr>' 
+
+    text = text + '<tr><td>' +  df.iloc[row]['PREFIX'] + '</td><td><a target="_blank" href="' + df.iloc[row]['COOPSITE'] + '">' + df.iloc[row]['COOP'] + '</a></td><td>' +  df.iloc[row]['LNAME'] + '</td><td>' +  df.iloc[row]['CITY'] + '</td><td>' +  str(df.iloc[row]['DATEINST'].year) + '-' + str(df.iloc[row]['DATEINST'].month).rjust(2, '0') + '-' + str(df.iloc[row]['DATEINST'].day).rjust(2, '0') + '</td><td style="text-align:right">' +  str(round(float(PeakPW),1))  + '</td><td style="text-align:right">' + str(round(prod_today/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_yesterday/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_avg_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_30/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_max_all/1000,1)) + '</td><td style="text-align:right">' + str(round(prod_total/1000000,1)) + '</td></tr>' 
     tot_kwc = tot_kwc + float(df.iloc[row]['PeakPW'])
     tot_today =  tot_today + prod_today
     tot_yesterday =  tot_yesterday + prod_yesterday
@@ -862,15 +867,16 @@ filename = "prod_tot_IDF_text"
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close()
-    
-    
+
+
+
 prod_total_all = df_prodAll['production_in_wh'].sum(skipna = True)
 prod_yesterday = df_prodYesterday['production_in_wh'].sum(skipna = True)
 prod_month = df_prod30['production_in_wh'].sum(skipna = True)
 prod_today = df_prodToday['production_in_wh'].sum(skipna = True)
     
 filename = "Dashboard-prod-today-yesterday-month"
-text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">- ce jour : ' + str(round(prod_today/1000,1)) + ' KWh<br>- hier : ' + str(round(prod_yesterday/1000,1)) + ' KWh<br>- 30 derniers jours : ' + str(round(prod_month/1000000,1)) + ' MWh<br>- centrales en service : ' + str(len(cfg.df_sites)) + '</div></body></html>'
+text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /></head><body style="background-color:white;"><div class="textarea">- ce jour : ' + str(round(prod_today/1000000,1)) + ' MWh<br>- hier : ' + str(round(prod_yesterday/1000000,1)) + ' MWh<br>- 30 derniers jours : ' + str(round(prod_month/1000000,1)) + ' MWh<br>- centrales en service : ' + str(len(cfg.df_sites)) + '</div></body></html>'
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close() 
@@ -880,6 +886,7 @@ text='<html><head><link type="text/css" rel="Stylesheet" href="'+cfg.ESCSS+'" />
 file1 = open(file_path + filename + ".html","w", encoding='utf8')
 file1.write(text)
 file1.close() 
+
 
 
 # In[ ]:

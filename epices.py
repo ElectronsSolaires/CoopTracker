@@ -5,9 +5,11 @@ import time
 import utils as utils
 from datetime import  date
 
+_session = requests.Session()
+
 def get_data_prod_day(site, d, prefix, cfg):
     if site == str(9999): #FSMV
-        response = requests.get('https://tools.fsmv.fr/graph/fsmv_api.php?energy_type=prod&date='+d)
+        response = _session.get('https://tools.fsmv.fr/graph/fsmv_api.php?energy_type=prod&date='+d)
         print(str(response.text).find("No Record"))
         if response.status_code != 200 and response.status_code != 404:
             raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
@@ -24,7 +26,11 @@ def get_data_prod_day(site, d, prefix, cfg):
         newdata = filedata.replace("DATE",d)
         j = json.loads(newdata.replace("PRODDAY",str(p)))
     else:
-        response = requests.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+ str(site) +'&date='+d, headers=cfg.token_epice)
+        try:
+            response = _session.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+ str(site) +'&date='+d, headers=cfg.token_epice)
+        except requests.exceptions.RequestException as exc:
+            print(f"Skipping data for site {site} on {d}: {exc}")
+            return pd.DataFrame(columns=['utc_timestamps', 'production_in_wh'])
         if(response.status_code != 200):
             raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
         j = json.loads(response.text)
@@ -43,13 +49,13 @@ def retreive_all_data(site,end_date,cfg,prod_file_path):
     df_prod=get_data_prod_hist(start_date, end_date, site['EPID'], site['PREFIX'], cfg.NEXTCLOUD,prod_file_path,cfg)
 
 def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud,prod_file_path,cfg):
-    df_prod = pd.DataFrame()
+    frames = []
     for single_date in utils.daterange(start_date, end_date):
         d = single_date.strftime("%Y-%m-%d")
         if site == str(9999): #FSMV
             print("Getting data from FSMV for date "+d+" date site "+ site)
-            response = requests.get('https://tools.fsmv.fr/graph/fsmv_api.php?energy_type=prod&date='+d)
-            if response.status_code != 200 and response.status.code != 404:
+            response = _session.get('https://tools.fsmv.fr/graph/fsmv_api.php?energy_type=prod&date='+d)
+            if response.status_code != 200 and response.status_code != 404:
                 raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
             elif response.status_code == 200 and str(response.text).find('No Record Found')!=-1: #no data yet
                 p = 0
@@ -65,7 +71,11 @@ def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud,prod
             j = json.loads(filedata)
         else:
             print("Getting data from epice for date "+d+" date site "+ site)
-            response = requests.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+str(site)+'&date=' + d, headers=cfg.token_epice)
+            try:
+                response = _session.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+str(site)+'&date=' + d, headers=cfg.token_epice)
+            except requests.exceptions.RequestException as exc:
+                print(f"Skipping data for site {site} on {d}: {exc}")
+                continue
             if(response.status_code != 200):
                 raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
             j = json.loads(response.text)
@@ -73,12 +83,10 @@ def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud,prod
             #no data for this days
             print("no data for day:" + str(d))
         else:
-            if single_date == start_date:
-                df_prod = pd.DataFrame(j['site_hourly_production']['hourly_productions'])
-            else:
-                df_prod = df_prod.append(pd.DataFrame(j['site_hourly_production']['hourly_productions']))
-            df_prod['utc_timestamps_Paris'] = pd.to_datetime(df_prod['utc_timestamps'])
-            df_prod['utc_timestamps_Paris']=df_prod['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
+            frame = pd.DataFrame(j['site_hourly_production']['hourly_productions'])
+            frames.append(frame)
+            frame['utc_timestamps_Paris'] = pd.to_datetime(frame['utc_timestamps'])
+            frame['utc_timestamps_Paris'] = frame['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
             time.sleep(1)
             filename = prefix_backup + '-' + d + "-prod.json"
             if nextcloud == True:
@@ -94,4 +102,9 @@ def get_data_prod_hist(start_date, end_date, site, prefix_backup, nextcloud,prod
             #f.close()
             json.dump(j,f)
 
+    if not frames:
+        return pd.DataFrame()
+    df_prod = pd.concat(frames, ignore_index=True)
+    df_prod['utc_timestamps_Paris'] = pd.to_datetime(df_prod['utc_timestamps'])
+    df_prod['utc_timestamps_Paris'] = df_prod['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
     return df_prod
