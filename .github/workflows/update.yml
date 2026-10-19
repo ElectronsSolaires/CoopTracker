@@ -3,7 +3,9 @@ name: Update CoopTracker
 on:
   schedule:
     - cron: "15 * * * *"
+      timezone: "Europe/Paris"
     - cron: "10 * * * *"
+      timezone: "Europe/Paris"
   workflow_dispatch:
 
 concurrency:
