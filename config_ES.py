@@ -17,7 +17,8 @@ token_epice = {
 }
 APIK_OWM = os.environ["OPENWEATHERMAP_API_KEY"]
 
-locale.setlocale(locale.LC_ALL, 'fr_FR')
+#locale.setlocale(locale.LC_ALL, 'fr_FR')
+locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
 NEXTCLOUD = False
 NEXTCLOUD_USERNAME = ''
 NEXTCLOUD_PASSWORD = ''
