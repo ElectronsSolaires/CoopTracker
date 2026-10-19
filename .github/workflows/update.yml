@@ -24,12 +24,21 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     env:
       TZ: Europe/Paris
+      LANG: fr_FR.UTF-8
+      LC_ALL: fr_FR.UTF-8
       MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
       EPICES_TOKEN: ${{ secrets.EPICES_TOKEN }}
       OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Configure French locale
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y locales
+          sudo locale-gen fr_FR.UTF-8
+          sudo update-locale LANG=fr_FR.UTF-8
 
       - uses: actions/setup-python@v5
         with:
