@@ -1,0 +1,69 @@
+name: Update CoopTracker
+
+on:
+  schedule:
+    - cron: "15 * * * *"
+    - cron: "10 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: cooptracker-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    env:
+      TZ: Europe/Paris
+      MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+      EPICES_TOKEN: ${{ secrets.EPICES_TOKEN }}
+      OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.7"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Generate EP pages
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '15 * * * *' }}
+        run: python cooptracker_EP.py
+
+      - name: Generate ES pages
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '10 * * * *' }}
+        run: python cooptracker_ES.py
+
+      - name: Commit new Raw data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Raw/
+          if ! git diff --cached --quiet; then
+            git commit -m "Update Raw production data"
+            git push
+          fi
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: www
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
