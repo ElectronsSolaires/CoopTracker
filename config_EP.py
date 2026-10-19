@@ -10,13 +10,18 @@
 
 import locale
 import pandas as pd
+import os
 from datetime import datetime, date, timedelta
 
-mapbox_access_token = 'pk.eyJ1IjoiamUxMjM0IiwiYSI6ImNrc2RjYzE1MTBtaWkyd280NzhhdTFiYjkifQ.J4X6FeD_2nL5kCcTVu4S0g'
-locale.setlocale(locale.LC_ALL, 'fr_FR')
+mapbox_access_token = os.environ["MAPBOX_TOKEN"]
+token_epice = {
+    "Authorization": f"Token {os.environ['EPICES_TOKEN']}"
+}
+APIK_OWM = os.environ["OPENWEATHERMAP_API_KEY"]
+
+#locale.setlocale(locale.LC_ALL, 'fr_FR')
+locale.setlocale(locale.LC_ALL, 'fr_FR.UTF-8')
 NEXTCLOUD = False
-token_epice = {'Authorization' : 'Token qyoyq6ORQh1p382GoG-_KfvlsWQ'}
-APIK_OWM='526accb362b842ee2dcca2b2303e4d56'
 ESCSS = 'https://www.electrons-solaires93.org/wp-content/themes/ample-pro/style.css'
 CSV_COOPS = 'cooperatives.csv'
 GEOJSON_DATA_IDF = "IDF_filtered.geojson"
