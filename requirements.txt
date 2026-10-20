@@ -1,5 +1,5 @@
 kaleido          
 numpy              
 pandas           
-plotly<6
+plotly<7
 requests           
