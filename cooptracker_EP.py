@@ -836,6 +836,7 @@ for row in range(0, len(df)):
             [df_prodToday, df_prod_today],
             ignore_index=True
         )
+        prod_today = df_prod_today['production_in_wh'].sum(skipna=True)
     else:
         print(
             "no data for day:",
@@ -843,8 +844,8 @@ for row in range(0, len(df)):
             "site:",
             df.iloc[row]['EPID']
         )
+        prod_today = 0
 
-    prod_today = df_prod_today['production_in_wh'].sum(skipna = True)
     prod_yesterday = df_prod_yesterday['production_in_wh'].sum(skipna = True)
     prod_avg_30 = df_prod_30['production_in_wh'].mean(skipna = True)
     prod_max_30 = df_prod_30['production_in_wh'].max(skipna = True)
