@@ -1,12 +1,21 @@
 name: Update CoopTracker
 
 on:
-  schedule:
-    - cron: "15 * * * *"
-      timezone: "Europe/Paris"
-    - cron: "10 * * * *"
-      timezone: "Europe/Paris"
+  #schedule:
+  #  - cron: "15 * * * *"
+  #    timezone: "Europe/Paris"
+  #  - cron: "10 * * * *"
+  #    timezone: "Europe/Paris"
   workflow_dispatch:
+    inputs:
+      target:
+        description: "Which CoopTracker task to run"
+        required: true
+        type: choice
+        options:
+          - ES
+          - EP
+          - all
 
 concurrency:
   group: cooptracker-update
@@ -51,12 +60,20 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
+      #- name: Generate EP pages
+      #  if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '15 * * * *' }}
+      #  run: python cooptracker_EP.py
+
+      #- name: Generate ES pages
+      #  if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '10 * * * *' }}
+      #  run: python cooptracker_ES.py
+
       - name: Generate EP pages
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '15 * * * *' }}
+        if: ${{ github.event_name == 'schedule' && github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch' && (inputs.target == 'EP' || inputs.target == 'all') }}
         run: python cooptracker_EP.py
 
       - name: Generate ES pages
-        if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '10 * * * *' }}
+        if: ${{ github.event_name == 'schedule' && github.event.schedule == '10 * * * *' || github.event_name == 'workflow_dispatch' && (inputs.target == 'ES' || inputs.target == 'all') }}
         run: python cooptracker_ES.py
 
       - name: Commit new Raw data
