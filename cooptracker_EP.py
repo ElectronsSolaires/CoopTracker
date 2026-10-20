@@ -31,7 +31,7 @@ import json
 import time
 
 import config_EP as cfg        #file containing API keys / credentials / configuration
-update_all = False             #update all plots (independently of scheduled updates)
+update_all = True             #update all plots (independently of scheduled updates)
 file_path = "./www/"            #tell where local files are stored 
 prod_file_path = "./Raw/"      #tell where production files are stored 
 
@@ -285,18 +285,25 @@ def save_prod_day_text(df, filename):
 #Update only after 8am (UTC)
 if datetime.now().hour >= 8:
     #Daily production for each site
+    df_prodAll_frames = []
     for row in range(0, len(cfg.df_sites)):
         df_prod=epices.get_data_prod_day(cfg.df_sites.iloc[row]['EPID'],d, cfg.df_sites.iloc[row]['PREFIX'], cfg)
+        if df_prod.empty:
+            print(f"Skipping daily chart for site {cfg.df_sites.iloc[row]['EPID']}: no production data for {d}")
+            continue
+
         fig=plot_hist_prod(df_prod, "Historique journalier de production ("+cfg.df_sites.iloc[row]['SNAME']+", "+cfg.df_sites.iloc[row]['CITY']+")", 'utc_timestamps_Paris', 'Heures')
         utils.save_fig(fig, cfg.df_sites.iloc[row]['PREFIX']+'_prod_today', file_path)
         save_prod_day_text(df_prod, cfg.df_sites.iloc[row]['PREFIX']+'_prod_today_tex')
-        if row == 0:
-            df_prodAll=df_prod
-        df_prodAll['production_in_wh'] = df_prodAll['production_in_wh'] + df_prod['production_in_wh'] 
-        
-    #Total production of all sites
-    fig=plot_hist_prod_only(df_prodAll, "Historique journalier de production", 'utc_timestamps_Paris', 'Heures')
-    utils.save_fig(fig, 'All_prod_today', file_path)
+        df_prodAll_frames.append(df_prod[['utc_timestamps_Paris', 'production_in_wh']])
+
+    if df_prodAll_frames:
+        df_prodAll = pd.concat(df_prodAll_frames, ignore_index=True)
+        df_prodAll = df_prodAll.groupby('utc_timestamps_Paris', as_index=False)['production_in_wh'].sum()
+
+        #Total production of all sites
+        fig=plot_hist_prod_only(df_prodAll, "Historique journalier de production", 'utc_timestamps_Paris', 'Heures')
+        utils.save_fig(fig, 'All_prod_today', file_path)
 
 
 # In[ ]:
@@ -905,7 +912,3 @@ file1.close()
 
 
 # In[ ]:
-
-
-
-
