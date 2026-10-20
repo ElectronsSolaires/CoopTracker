@@ -31,7 +31,7 @@ import json
 import time
 
 import config_EP as cfg        #file containing API keys / credentials / configuration
-update_all = True             #update all plots (independently of scheduled updates)
+update_all = False             #update all plots (independently of scheduled updates)
 file_path = "./www/"            #tell where local files are stored 
 prod_file_path = "./Raw/"      #tell where production files are stored 
 
