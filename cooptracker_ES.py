@@ -47,7 +47,7 @@ prod_file_path = "./Raw/"      #tell where production files are stored
 ##################################################################################
 
 #Updated once a day at 3am (UTC)
-if datetime.now().hour == 3 or update_all == True:
+if datetime.now().hour == 4 or update_all == True:
     #Get CSV from URL
     r = requests.request(
         method='get',
@@ -270,7 +270,7 @@ def prod_hist(start_date, end_date, days):
         fig=utils.save_fig(fig, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_" + str(days), file_path)        
 
 #updated once a day at 2am
-if datetime.now().hour == 2 or update_all == True:
+if datetime.now().hour == 4 or update_all == True:
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
     prod_hist(start_date, end_date, 3)
@@ -390,7 +390,7 @@ def prod_hist_day(start_date, end_date, days):
     utils.save_fig(fig,"prod_hist_unhabitants",file_path)
 
 #updates once a day at 4am (UTC)
-if datetime.now().hour == 4 or update_all == True:
+if datetime.now().hour == 5 or update_all == True:
     thrity_days_ago = datetime.now() - timedelta(days=30)
     start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
     prod_hist_day(start_date, end_date, 30)
@@ -480,7 +480,7 @@ def plot_weather_hist(df_prod, df_prodGHI, titlename):
     return fig
 
 #Updated once a day at 3am (UTC)
-if datetime.now().hour == 3 or update_all == True:
+if datetime.now().hour == 5 or update_all == True:
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
     # Weather for each site
@@ -594,7 +594,7 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1.close() 
 
 #uUdated once a day at 4am (UTC)
-if datetime.now().hour == 4 or update_all == True:
+if datetime.now().hour == 6 or update_all == True:
     #Total production for each site
     for row in range(0, len(cfg.df_sites)):
         df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
@@ -649,7 +649,7 @@ if datetime.now().hour == 4 or update_all == True:
 #############################################################
 # Content for monthly publishing (social networks...)
 #############################################################
-if datetime.now().hour == 4 or update_all == True:
+if datetime.now().hour == 6 or update_all == True:
     today = datetime.now()
     end_lastMonth = today.replace(day=1)
     start_lastMonth = (end_lastMonth - timedelta(days=1)).replace(day=1)    

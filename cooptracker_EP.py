@@ -171,7 +171,7 @@ def plot_map_cooperatives(geo_json, csv, df_sites, filename, lat_map, lon_map):
     save_map(fig, filename)
 
 #Updated once a day at 3am (UTC)
-if datetime.now().hour == 2 or update_all == True: 
+if datetime.now().hour == 5 or update_all == True: 
     # Map per cooperative (IDF)
     plot_map_cooperatives(cfg.GEOJSON_DATA_IDF, cfg.CSV_COOPS, cfg.df_sites, 'map_IDF', 48.882252, 2.310389) 
     #plot_map_cooperatives(cfg.GEOJSON_DATA_IDF, cfg.CSV_COOPS, cfg.df_sites, 'map_IDF', 48.8845927777778, 2.38651155555556) 
@@ -350,7 +350,7 @@ def retreive_all_data(end_date):
         df_prod=epices.get_data_prod_hist(start_date, end_date, cfg.df_sites.iloc[row]['EPID'], cfg.df_sites.iloc[row]['PREFIX'], cfg.NEXTCLOUD, prod_file_path,cfg)
 
 #updated once a day at 3am
-if datetime.now().hour == 3 or update_all == True:
+if datetime.now().hour == 4 or update_all == True:
     #retreive_all_data(end_date)
     past_days_ago = datetime.now() - timedelta(days=3)
     start_date = date(past_days_ago.year, past_days_ago.month, past_days_ago.day)
@@ -474,7 +474,7 @@ def prod_hist_day(start_date, end_date, days):
     utils.save_fig(fig,"prod_hist_unhabitants", file_path)
 
 #updates once a day at 4am (UTC)
-if datetime.now().hour == 4 or update_all == True:
+if datetime.now().hour == 5 or update_all == True:
     thrity_days_ago = datetime.now() - timedelta(days=30)
     start_date = date(thrity_days_ago.year, thrity_days_ago.month, thrity_days_ago.day)
     prod_hist_day(start_date, end_date, 30)
@@ -649,7 +649,7 @@ def save_prod_sinceinstall_text(k, filename):
     file1.close() 
 
 #Updated once a day at 4am (UTC)
-if datetime.now().hour == 4 or update_all == True:
+if datetime.now().hour == 6 or update_all == True:
     #Total production for each site
     fig_all_small = go.Figure()
     fig_all_large = go.Figure()
