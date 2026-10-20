@@ -786,6 +786,7 @@ tot_kwc = 0
 tot_today = 0
 tot_yesterday = 0
 tot_total = 0
+df_prodToday = pd.DataFrame(columns=['production_in_wh'])
 for row in range(0, len(df)):
     #prod total
     df_prod_all=datastorage.get_all_data(df.iloc[row]['PREFIX'], prod_file_path)
@@ -823,13 +824,26 @@ for row in range(0, len(df)):
     # prod today
     print(df.iloc[row]['EPID'])
     df_prod_today=epices.get_data_prod_day(df.iloc[row]['EPID'],d, df.iloc[row]['PREFIX'], cfg)
-    if len(df_prod_today)>0:
-        if row == 0:
-            df_prodToday=df_prod_today
-        else:
-            df_prodToday = pd.concat([df_prodToday, df_prod_today], ignore_index=True) 
+    #if len(df_prod_today)>0:
+    #    if row == 0:
+    #        df_prodToday=df_prod_today
+    #    else:
+    #        df_prodToday = pd.concat([df_prodToday, df_prod_today], ignore_index=True) 
+    #else:
+    #    df_prod_today['production_in_wh'] = 0
+    if len(df_prod_today) > 0:
+        df_prodToday = pd.concat(
+            [df_prodToday, df_prod_today],
+            ignore_index=True
+        )
     else:
-        df_prod_today['production_in_wh'] = 0
+        print(
+            "no data for day:",
+            d,
+            "site:",
+            df.iloc[row]['EPID']
+        )
+
     prod_today = df_prod_today['production_in_wh'].sum(skipna = True)
     prod_yesterday = df_prod_yesterday['production_in_wh'].sum(skipna = True)
     prod_avg_30 = df_prod_30['production_in_wh'].mean(skipna = True)
