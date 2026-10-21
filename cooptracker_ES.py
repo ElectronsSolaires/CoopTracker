@@ -594,7 +594,7 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1.close() 
 
 #uUdated once a day at 4am (UTC)
-if datetime.now().hour == 7 or update_all == True:
+if datetime.now().hour == 6 or update_all == True:
     #Total production for each site
     for row in range(0, len(cfg.df_sites)):
         df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
