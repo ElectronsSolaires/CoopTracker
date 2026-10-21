@@ -594,7 +594,7 @@ def save_prod_hist_text_all(site, s, k, filename):
     file1.close() 
 
 #uUdated once a day at 4am (UTC)
-if datetime.now().hour == 6 or update_all == True:
+if datetime.now().hour == 7 or update_all == True:
     #Total production for each site
     for row in range(0, len(cfg.df_sites)):
         df_prod=datastorage.get_all_data(cfg.df_sites.iloc[row]['PREFIX'], prod_file_path)
@@ -672,7 +672,7 @@ if datetime.now().hour == 6 or update_all == True:
         df_prod['utc_timestamps_Paris'] = pd.to_datetime(df_prod['utc_timestamps'])
         df_prod['utc_timestamps_Paris']=df_prod['utc_timestamps_Paris'].dt.tz_convert('Europe/Paris')
         df_prod['Date'] = df_prod['utc_timestamps_Paris'].dt.strftime('%y-%m-%d')
-        df_prod['production_in_wh'] = df_prod['production_in_wh'].fillna(0)
+        df_prod['production_in_wh'] = pd.to_numeric(df_prod['production_in_wh'], errors='coerce').fillna(0)
         numeric_columns = df_prod.select_dtypes(include='number').columns.tolist()
         df_grouped = df_prod.groupby('Date', as_index=True)[numeric_columns].sum().reset_index()
         df_prod = pd.DataFrame(df_grouped)
