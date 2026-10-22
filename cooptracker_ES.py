@@ -622,6 +622,10 @@ if datetime.now().hour == 6 or update_all == True:
         #save_prod_hist_text_all(-1, EH, kwh, cfg.df_sites.iloc[row]['PREFIX'] + "-prod_hist_tex")
 
 
+    kwh_since_install = (
+        df_prodWR['production_in_wh'].sum() + df_prodJZ['production_in_wh'].sum()
+    )
+
     #filter dates (histogram over a 2 years window)
     two_years_ago = datetime.now() - timedelta(days=365*2)
     start_d = "{0}-{1:02}".format(two_years_ago.year-2000, two_years_ago.month)
@@ -640,7 +644,7 @@ if datetime.now().hour == 6 or update_all == True:
     utils.save_fig(fig,"All_data_all_sites", file_path)
     kwh=round(df_prodWR['production_in_wh'].sum(),1) + round(df_prodJZ['production_in_wh'].sum(),1)
     EH = kwh / (float(cfg.EH_WhPerYear)/365.0 * daysWR)   #inhabitant equivalent 
-    save_prod_hist_text_all(-1,EH, kwh, "All-prod_hist_tex")
+    save_prod_hist_text_all(-1,EH, kwh_since_install, "All-prod_hist_tex")
 
 
 # In[ ]:
