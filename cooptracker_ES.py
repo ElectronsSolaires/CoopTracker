@@ -105,7 +105,7 @@ if datetime.now().hour == 4 or update_all == True:
     #Save map as png and html
     filename = 'societaires'
     fig.write_image(file_path + filename + ".png")
-    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='https://cdn.plot.ly/plotly-mapbox-2.11.1.min.js')
+    plotly.offline.plot(fig, filename = file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn')
 
     #Upload on NextCloud
     if cfg.NEXTCLOUD == True:

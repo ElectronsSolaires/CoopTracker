@@ -47,7 +47,7 @@ prod_file_path = "./Raw/"      #tell where production files are stored
 
 def save_map(fig, filename):
     #Save map as html only; skip PNG export to avoid Kaleido hangs.
-    plotly.offline.plot(fig, filename=file_path + filename + ".html", auto_open=False, include_plotlyjs='https://cdn.plot.ly/plotly-mapbox-2.11.1.min.js')
+    plotly.offline.plot(fig, filename=file_path + filename + ".html", auto_open=False, include_plotlyjs='cdn')
         
     #Upload on NextCloud
     if cfg.NEXTCLOUD == True:
