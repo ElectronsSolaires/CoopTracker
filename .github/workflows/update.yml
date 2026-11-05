@@ -1,11 +1,12 @@
 name: Update CoopTracker
 
 on:
-  #schedule:
-  #  - cron: "15 * * * *"
-  #    timezone: "Europe/Paris"
-  #  - cron: "10 * * * *"
-  #    timezone: "Europe/Paris"
+  # schedule:
+  #   - cron: "15 * * * *"
+  #     timezone: "Europe/Paris"
+  #   - cron: "10 * * * *"
+  #     timezone: "Europe/Paris"
+
   workflow_dispatch:
     inputs:
       target:
@@ -21,18 +22,17 @@ concurrency:
   group: cooptracker-update
   cancel-in-progress: false
 
-permissions:
-  contents: write
-  pages: write
-  id-token: write
-
 jobs:
+
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
     env:
       TZ: Europe/Paris
       LANG: fr_FR.UTF-8
@@ -42,7 +42,9 @@ jobs:
       OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
       - name: Configure French locale
         run: |
@@ -51,7 +53,8 @@ jobs:
           sudo locale-gen fr_FR.UTF-8
           sudo update-locale LANG=fr_FR.UTF-8
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: pip
@@ -60,23 +63,29 @@ jobs:
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
 
-      #- name: Generate EP pages
-      #  if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '15 * * * *' }}
-      #  run: python cooptracker_EP.py
-
-      #- name: Generate ES pages
-      #  if: ${{ github.event_name == 'workflow_dispatch' || github.event.schedule == '10 * * * *' }}
-      #  run: python cooptracker_ES.py
-
       - name: Generate EP pages
-        if: ${{ github.event_name == 'schedule' && github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch' && (inputs.target == 'EP' || inputs.target == 'all') }}
+        if: >
+          ${{ 
+            github.event_name == 'schedule' &&
+            github.event.schedule == '15 * * * *'
+            ||
+            github.event_name == 'workflow_dispatch' &&
+            (inputs.target == 'EP' || inputs.target == 'all')
+          }}
         run: python cooptracker_EP.py
 
       - name: Generate ES pages
-        if: ${{ github.event_name == 'schedule' && github.event.schedule == '10 * * * *' || github.event_name == 'workflow_dispatch' && (inputs.target == 'ES' || inputs.target == 'all') }}
+        if: >
+          ${{
+            github.event_name == 'schedule' &&
+            github.event.schedule == '10 * * * *'
+            ||
+            github.event_name == 'workflow_dispatch' &&
+            (inputs.target == 'ES' || inputs.target == 'all')
+          }}
         run: python cooptracker_ES.py
 
-      - name: Commit new Raw data
+      - name: Commit new Raw data and generated website
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -85,20 +94,51 @@ jobs:
 
           if ! git diff --cached --quiet; then
             git commit -m "Update production data and generated website"
+
             git pull --rebase origin "$GITHUB_REF_NAME"
 
+            success=false
+
             for i in 1 2 3; do
-              git push origin "HEAD:$GITHUB_REF_NAME" && break
+              if git push origin "HEAD:$GITHUB_REF_NAME"; then
+                success=true
+                break
+              fi
+
               echo "Push failed, retry $i/3..."
               sleep 20
             done
+
+            if [ "$success" != "true" ]; then
+              echo "Git push failed after 3 attempts."
+              exit 1
+            fi
           fi
 
-      - uses: actions/configure-pages@v5
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
 
-      - uses: actions/upload-pages-artifact@v4
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v4
         with:
           path: www
+
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: update
+
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
 
       - name: Deploy to GitHub Pages
         id: deployment
