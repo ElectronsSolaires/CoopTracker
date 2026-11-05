@@ -80,11 +80,18 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add Raw/ www/
+
           if ! git diff --cached --quiet; then
             git commit -m "Update production data and generated website"
             git pull --rebase origin "$GITHUB_REF_NAME"
-            git push origin "HEAD:$GITHUB_REF_NAME"
+
+            for i in 1 2 3; do
+              git push origin "HEAD:$GITHUB_REF_NAME" && break
+              echo "Push failed, retry $i/3..."
+              sleep 20
+            done
           fi
 
       - uses: actions/configure-pages@v5
