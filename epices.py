@@ -2,6 +2,7 @@ import requests
 import json
 import pandas as pd
 import time
+import sys
 import utils as utils
 from datetime import  date
 
@@ -29,7 +30,8 @@ def get_data_prod_day(site, d, prefix, cfg):
         try:
             response = _session.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+ str(site) +'&date='+d, headers=cfg.token_epice)
         except requests.exceptions.RequestException as exc:
-            raise RuntimeError(f"Unable to get production data for site {site} on {d}") from exc
+            print(f"Epices n'est pas disponible pour le site {site} à la date {d}: {exc}", file=sys.stderr, flush=True)
+            raise SystemExit(75) from None
         if(response.status_code != 200):
             raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
         j = json.loads(response.text)
