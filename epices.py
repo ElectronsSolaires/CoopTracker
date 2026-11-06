@@ -29,8 +29,7 @@ def get_data_prod_day(site, d, prefix, cfg):
         try:
             response = _session.get('https://api.epices-energie.fr/v1/site_hourly_production?site_id='+ str(site) +'&date='+d, headers=cfg.token_epice)
         except requests.exceptions.RequestException as exc:
-            print(f"Skipping data for site {site} on {d}: {exc}")
-            return pd.DataFrame(columns=['utc_timestamps', 'production_in_wh'])
+            raise RuntimeError(f"Unable to get production data for site {site} on {d}") from exc
         if(response.status_code != 200):
             raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
         j = json.loads(response.text)
