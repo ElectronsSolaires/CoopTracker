@@ -64,6 +64,7 @@ def plot_map_societaires(geo_json, csv, df_sites, coopname, filename, lat_map, l
         method='get',
         url= csv
     )
+    r.encoding = 'utf-8'
     df = pd.read_csv(StringIO(r.text),sep=';') 
 
     #Load GeoJSON data (polygones)

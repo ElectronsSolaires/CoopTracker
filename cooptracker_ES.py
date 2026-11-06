@@ -53,6 +53,7 @@ if datetime.now().hour == 4 or update_all == True:
         method='get',
         url= cfg.CSV_SOCIETARIES
     )
+    r.encoding = 'utf-8'
     df = pd.read_csv(StringIO(r.text),sep=';') 
 
     #Load GeoJSON data (polygones)
