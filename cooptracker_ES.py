@@ -12,6 +12,7 @@
 # License: CC-BY-SA 4.0
 ##########################################################################################
 
+import os
 import warnings
 
 warnings.simplefilter("ignore", FutureWarning)
@@ -31,7 +32,7 @@ import json
 import time
 
 import config_ES as cfg           #file containing API keys / credentials / configuration
-update_all = False                #update all plots (independently of scheduled updates)
+update_all = os.environ.get("UPDATE_ALL", "false").lower() == "true"
 file_path = "./www/ES/"            #tell where local files are stored 
 prod_file_path = "./Raw/"      #tell where production files are stored 
 
