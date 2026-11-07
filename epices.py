@@ -32,6 +32,9 @@ def get_data_prod_day(site, d, prefix, cfg):
         except requests.exceptions.RequestException as exc:
             print(f"Epices n'est pas disponible pour le site {site} à la date {d}: {exc}", file=sys.stderr, flush=True)
             raise SystemExit(75) from None
+        if response.status_code == 403:
+            print(f"Accès à Epices refusé (HTTP 403) pour le site {site} à la date {d}.", file=sys.stderr, flush=True)
+            raise SystemExit(75) from None
         if(response.status_code != 200):
             raise Exception("Error while getting data for site : " + site + ", status code : "+ str(response.status_code))
         j = json.loads(response.text)
